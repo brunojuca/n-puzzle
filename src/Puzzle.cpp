@@ -4,13 +4,21 @@
 
 using namespace std;
 
-Puzzle::Puzzle(vector<vector<int>> state)
+Puzzle::Puzzle(vector<vector<int>> state, vector<vector<int>> goalState)
 {
     for (vector<int> row : state)
         if (row.size() != state.size())
-            throw invalid_argument("The vector must have 2 dimensions of same size");
+            throw invalid_argument("The state vector must have 2 dimensions of same size");
+
+    for (vector<int> row : goalState)
+        if (row.size() != goalState.size())
+            throw invalid_argument("The goal state vector must have 2 dimensions of same size");
+
+    if (state.size() != goalState.size())
+            throw invalid_argument("The state vector and the goal state vector must have equal dimensions");
 
     this->state = state;
+    this->goalState = goalState;
     this->dimension = state.size();
     this->setZeroPosition();
 }
@@ -23,7 +31,7 @@ void Puzzle::printState()
 {
     cout << endl;
     cout << "Dimension: " << this->dimension << endl;
-    cout << "Zero position: (" << this->zeroRow << ", " << this->zeroColumn << ")" << endl;
+    cout << "Zero position: (" << this->zeroPos.first << ", " << this->zeroPos.second << ")" << endl;
     cout << endl;
     for (vector row : this->state)
     {
@@ -43,113 +51,38 @@ void Puzzle::setZeroPosition()
         {
             if (this->state[i][j] == 0)
             {
-                this->zeroRow = i;
-                this->zeroColumn = j;
+                this->zeroPos.first = i;
+                this->zeroPos.second = j;
                 return;
             }
         }
 }
 
-bool Puzzle::validZeroMovement(int movement)
+bool Puzzle::validZeroMovement(pair<int, int> movement)
 {
-    switch (movement)
-    {
-    case movement::UP:
-        if (this->zeroRow > 0)
-            return true;
-        break;
-    case movement::RIGHT:
-        if (this->zeroColumn < this->dimension - 1)
-            return true;
-        break;
-    case movement::DOWN:
-        if (this->zeroRow < this->dimension - 1)
-            return true;
-        break;
-    case movement::LEFT:
-        if (this->zeroColumn > 0)
-            return true;
-        break;
-    default:
-        return false;
-        break;
-    }
+    pair<int, int> newPos = pair<int, int>(this->zeroPos.first + movement.first, this->zeroPos.second + movement.second);
+    if (newPos.first >= 0 && newPos.first < this->dimension && newPos.second >= 0 && newPos.second < this->dimension)
+        return true;
     return false;
 }
 
-void Puzzle::moveZero(int movement)
+void Puzzle::moveZero(pair<int, int> movement)
 {
-    switch (movement)
-    {
-    case movement::UP:
-        this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow - 1][this->zeroColumn];
-        this->state[this->zeroRow - 1][this->zeroColumn] = 0;
-        this->zeroRow--;
-        break;
-    case movement::RIGHT:
-        this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow][this->zeroColumn + 1];
-        this->state[this->zeroRow][this->zeroColumn + 1] = 0;
-        this->zeroColumn++;
-
-        break;
-    case movement::DOWN:
-        this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow + 1][this->zeroColumn];
-        this->state[this->zeroRow + 1][this->zeroColumn] = 0;
-        this->zeroRow++;
-        break;
-    case movement::LEFT:
-        this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow][this->zeroColumn - 1];
-        this->state[this->zeroRow][this->zeroColumn - 1] = 0;
-        this->zeroColumn--;
-        break;
-    default:
-        break;
-    }
+    pair<int, int> newPos = pair<int, int>(this->zeroPos.first + movement.first, this->zeroPos.second + movement.second);
+    this->state[this->zeroPos.first][this->zeroPos.second] = this->state[newPos.first][newPos.second];
+    this->state[newPos.first][newPos.second] = 0;
+    this->zeroPos = newPos;
 }
 
-bool Puzzle::safelyMoveZero(int movement)
+bool Puzzle::safelyMoveZero(pair<int, int> movement)
 {
-    switch (movement)
+    pair<int, int> newPos = pair<int, int>(this->zeroPos.first + movement.first, this->zeroPos.second + movement.second);
+    if (newPos.first >= 0 && newPos.first < this->dimension && newPos.second >= 0 && newPos.second < this->dimension)
     {
-    case movement::UP:
-        if (this->zeroRow > 0)
-        {
-            this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow - 1][this->zeroColumn];
-            this->state[this->zeroRow - 1][this->zeroColumn] = 0;
-            this->zeroRow--;
-            return true;
-        }
-        break;
-    case movement::RIGHT:
-        if (this->zeroColumn < this->dimension - 1)
-        {
-            this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow][this->zeroColumn + 1];
-            this->state[this->zeroRow][this->zeroColumn + 1] = 0;
-            this->zeroColumn++;
-            return true;
-        }
-        break;
-    case movement::DOWN:
-        if (this->zeroRow < this->dimension - 1)
-        {
-            this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow + 1][this->zeroColumn];
-            this->state[this->zeroRow + 1][this->zeroColumn] = 0;
-            this->zeroRow++;
-            return true;
-        }
-        break;
-    case movement::LEFT:
-        if (this->zeroColumn > 0)
-        {
-            this->state[this->zeroRow][this->zeroColumn] = this->state[this->zeroRow][this->zeroColumn - 1];
-            this->state[this->zeroRow][this->zeroColumn - 1] = 0;
-            this->zeroColumn--;
-            return true;
-        }
-        break;
-    default:
-        return false;
-        break;
+        this->state[this->zeroPos.first][this->zeroPos.second] = this->state[newPos.first][newPos.second];
+        this->state[newPos.first][newPos.second] = 0;
+        this->zeroPos = newPos;
+        return true;
     }
     return false;
 }
@@ -157,8 +90,11 @@ bool Puzzle::safelyMoveZero(int movement)
 void Puzzle::shuffle(int moves)
 {
     srand((unsigned)time(NULL));
+    vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
     int madeMoves = 0;
     while (madeMoves < moves)
-        if (this->safelyMoveZero(rand() % 4))
-            madeMoves++;
+    {
+        this->safelyMoveZero(movements[rand() % 4]);
+        madeMoves++;
+    }
 }

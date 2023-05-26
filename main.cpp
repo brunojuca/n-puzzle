@@ -1,5 +1,6 @@
 #include "Puzzle.hpp"
 #include <iostream>
+#include <chrono>
 
 using namespace std;
 
@@ -10,8 +11,12 @@ int main()
                    {7, 8, 0}});
 
     puzzle.printState();
-    puzzle.shuffle(100);
+    auto start = chrono::steady_clock::now();
+    puzzle.shuffle(1000000);
+    auto end = chrono::steady_clock::now();
+    auto diff = end - start;
     puzzle.printState();
+    cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
 
     int opt = getchar();
     while (opt != int('q'))
