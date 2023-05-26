@@ -8,7 +8,11 @@ int main()
 {
     Puzzle puzzle({{1, 2, 3},
                    {4, 5, 6},
-                   {7, 8, 0}});
+                   {7, 8, 0}},
+                   
+                   {{1, 2, 3},
+                    {4, 5, 6},
+                    {7, 8, 0}});
 
     puzzle.printState();
     auto start = chrono::steady_clock::now();
