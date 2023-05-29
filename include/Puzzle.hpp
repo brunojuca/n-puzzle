@@ -22,6 +22,11 @@ private:
     int dimension;
     void setZeroPosition();
 
+    vector<vector<int>> visitedStates;
+    bool isVisitedState(vector<vector<int>> &state);
+    void addVisitedState( vector<vector<int>>& state);
+    void removeVisitedState( vector<vector<int>>& state);
+
 public:
     Puzzle(vector<vector<int>> state, vector<vector<int>> goalState);
     ~Puzzle();
@@ -30,6 +35,7 @@ public:
     void moveZero(pair<int, int> movement);
     bool safelyMoveZero(pair<int, int> movement);
     void shuffle(int moves);
+    bool backTraking();
 };
 
 #endif

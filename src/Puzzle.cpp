@@ -1,5 +1,6 @@
 #include "Puzzle.hpp"
 #include <iostream>
+#include <algorithm>
 #include <stdexcept>
 
 using namespace std;
@@ -97,4 +98,61 @@ void Puzzle::shuffle(int moves)
         this->safelyMoveZero(movements[rand() % 4]);
         madeMoves++;
     }
+}
+
+bool Puzzle::backTraking()
+{
+    if (this->state == this->goalState)
+    {
+        cout << "Solution found:" << endl;
+        this->printState();
+        return true;
+    }
+
+    vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+
+     for (pair<int, int> movement : movements)
+    {
+        if (this->validZeroMovement(movement))
+        {
+            this->moveZero(movement);
+
+            if (!isVisitedState(this->state))
+            {
+                addVisitedState(this->state);
+                if (this->backTraking())
+                    return true;
+                removeVisitedState(this->state);
+            }
+            this->moveZero({-movement.first, -movement.second});
+        }
+    }
+    return false; 
+}
+
+bool Puzzle::isVisitedState(vector<vector<int>> &state)
+{
+    vector<int> flatState;
+        for (const auto& row : state) {
+            flatState.insert(flatState.end(), row.begin(), row.end());
+        }
+        return find(visitedStates.begin(), visitedStates.end(), flatState) != visitedStates.end();
+}
+void Puzzle::addVisitedState( vector<vector<int>>& state)
+{
+    vector<int> flatState;
+        for (const auto& row : state) {
+            flatState.insert(flatState.end(), row.begin(), row.end());
+        }
+        visitedStates.push_back(flatState);
+}
+void Puzzle::removeVisitedState( vector<vector<int>>& state)
+{
+    vector<int> flatState;
+        for (const auto& row : state) {
+            flatState.insert(flatState.end(), row.begin(), row.end());
+        }
+        visitedStates.erase(remove_if(visitedStates.begin(), visitedStates.end(), [&flatState](const std::vector<int>& s) {
+            return s == flatState;
+        }), visitedStates.end());
 }
