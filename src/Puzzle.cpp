@@ -2,7 +2,13 @@
 #include <iostream>
 #include <algorithm>
 #include <stdexcept>
-
+#include <limits.h>
+#include <cmath>
+#include <string>
+#include <stdlib.h>
+#include <queue>
+#include <chrono>
+#include <unordered_set>
 using namespace std;
 
 Puzzle::Puzzle(vector<vector<int>> state, vector<vector<int>> goalState)
@@ -22,10 +28,12 @@ Puzzle::Puzzle(vector<vector<int>> state, vector<vector<int>> goalState)
     this->goalState = goalState;
     this->dimension = state.size();
     this->setZeroPosition();
+    this->moves = 0;
 }
 
 Puzzle::~Puzzle()
 {
+
 }
 
 void Puzzle::printState()
@@ -99,60 +107,142 @@ void Puzzle::shuffle(int moves)
         madeMoves++;
     }
 }
-
-bool Puzzle::backTraking()
+string Puzzle::convertStateToString(const vector<vector<int>>& state)
 {
+   string stateString = "";
+    for (vector<int> row : state)
+    {
+        for (int num : row)
+        {
+            stateString += to_string(num);
+        }
+    }
+    return stateString;
+}
+// Heurística
+int Puzzle::manhattanDistance() { 
+        int distance = 0;
+        int dimension = state.size();
+
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                int value = state[i][j];
+                if (value != 0) {
+                    int goalRow, goalCol;
+                    findGoalPosition(value, goalRow, goalCol);
+                    distance += abs(i - goalRow) + abs(j - goalCol);
+                }
+            }
+        }
+
+        return distance;
+}
+
+void Puzzle::findGoalPosition(int value, int& row, int& col) { 
+    int dimension = goalState.size();
+
+    for (int i = 0; i < dimension; i++) {
+        for (int j = 0; j < dimension; j++) {
+            if (goalState[i][j] == value) {
+                row = i;
+                col = j;
+                return;
+            }
+        }
+    }
+}
+vector<vector<int>> Puzzle::getStateFromString(const string& stateString)
+{
+    vector<vector<int>> aux_state;
+    int n = sqrt(stateString.size());
+    int index = 0;
+
+    for (int i = 0; i < n; ++i)
+    {
+        vector<int> row;
+        for (int j = 0; j < n; ++j)
+        {
+            int num = stateString[index++] - '0';
+            row.push_back(num);
+        }
+        aux_state.push_back(row);
+    }
+
+    return aux_state;
+}
+bool Puzzle::backTracking(int depthLimit)
+{   
     if (this->state == this->goalState)
     {
         cout << "Solution found:" << endl;
         this->printState();
+        cout << "Moves: " << this->moves << endl;
         return true;
     }
-
+    if(depthLimit == 0) return false;
     vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
 
-     for (pair<int, int> movement : movements)
+    for (pair<int, int> movement : movements)
     {
-        if (this->validZeroMovement(movement))
+        if(this->safelyMoveZero({movement.first, movement.second}))
         {
-            this->moveZero(movement);
-
-            if (!isVisitedState(this->state))
+            string stateString = convertStateToString(this->state);
+            
+            if (visitedStates.find(stateString) == visitedStates.end())  // Verifica se o estado já foi visitado
             {
-                addVisitedState(this->state);
-                if (this->backTraking())
+                visitedStates.insert(stateString);  // Adiciona o estado ao conjunto de estados visitados
+                this->moves += 1;
+                if (this->backTracking(depthLimit - 1))
+                {
                     return true;
-                removeVisitedState(this->state);
+                }
+                visitedStates.erase(stateString); 
             }
-            this->moveZero({-movement.first, -movement.second});
+            this->safelyMoveZero({-movement.first, -movement.second});
         }
+        
     }
     return false; 
 }
 
-bool Puzzle::isVisitedState(vector<vector<int>> &state)
+bool Puzzle::breadthFirstSearch()
 {
-    vector<int> flatState;
-        for (const auto& row : state) {
-            flatState.insert(flatState.end(), row.begin(), row.end());
+    queue<Puzzle> openList;
+    unordered_set<string> closedList;
+    openList.push(*this);
+
+    while (!openList.empty())
+    {
+        Puzzle currentPuzzle = openList.front();
+        openList.pop();
+        if (currentPuzzle.state == goalState)
+        {
+            cout << "Solution found:" << endl;
+            currentPuzzle.printState();
+            cout << "Moves: "<< this->moves << endl;
+            return true;
         }
-        return find(visitedStates.begin(), visitedStates.end(), flatState) != visitedStates.end();
-}
-void Puzzle::addVisitedState( vector<vector<int>>& state)
-{
-    vector<int> flatState;
-        for (const auto& row : state) {
-            flatState.insert(flatState.end(), row.begin(), row.end());
+        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+        for (pair<int, int> movement : movements)
+        {
+            Puzzle childPuzzle = currentPuzzle;
+            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+            {
+                if (closedList.find(convertStateToString(childPuzzle.state)) == closedList.end())
+                {
+                    this->moves += 1;
+                    openList.push(childPuzzle);
+                }
+               //childPuzzle.safelyMoveZero({-movement.first, -movement.second});
+            }
         }
-        visitedStates.push_back(flatState);
+        closedList.insert(convertStateToString(currentPuzzle.state));
+    }
+    
+    return false;
 }
-void Puzzle::removeVisitedState( vector<vector<int>>& state)
-{
-    vector<int> flatState;
-        for (const auto& row : state) {
-            flatState.insert(flatState.end(), row.begin(), row.end());
-        }
-        visitedStates.erase(remove_if(visitedStates.begin(), visitedStates.end(), [&flatState](const std::vector<int>& s) {
-            return s == flatState;
-        }), visitedStates.end());
-}
+
+
+
+
+

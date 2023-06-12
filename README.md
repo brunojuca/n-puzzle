@@ -5,7 +5,7 @@ Trabalho desenvolvido para a disciplina DCC014 - Inteligência Artificial
 
 ## Integrantes
 - Bruno Jucá - 201965013AC
-- Matheus Peron - xxxxxxxx
+- Matheus Peron - 201965089AC
 
 ---
 
@@ -16,5 +16,5 @@ make
 
 ## Execução
 ```bash
-./grafos.exe
+./n-puzzle.exe
 ```

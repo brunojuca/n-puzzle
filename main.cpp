@@ -6,23 +6,50 @@ using namespace std;
 
 int main()
 {
-    Puzzle puzzle({{1, 2, 3},
-                   {4, 5, 6},
-                   {7, 8, 0}},
-                   
-                   {{1, 2, 3},
-                    {4, 5, 6},
-                    {7, 8, 0}});
+    // Puzzle puzzle({{1, 2, 3, 4},
+    //                {5, 6, 7, 8},
+    //                {9, 10, 11, 12},
+    //                {13, 14, 15, 0}},
 
-    //puzzle.printState();
+    //               {{1, 2, 3, 4},
+    //                {5, 6, 7, 8},
+    //                {9, 10, 11, 12},
+    //                {13, 14, 15, 0}});
+ Puzzle puzzle({{1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}},
+
+                {{1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}});
+
+    // Teste - Backtracking 3x3
     auto start = chrono::steady_clock::now();
     puzzle.shuffle(1000000);
     puzzle.printState();
-    puzzle.backTraking();
+    int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
+    float K = 3; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
+    float depthLimit = K * distance;
+    cout << depthLimit << endl;
+    if (!puzzle.backTracking(depthLimit)){
+        cout << "solution invalid." << endl;
+    }
     auto end = chrono::steady_clock::now();
     auto diff = end - start;
-    //puzzle.printState();
     cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+
+    // Teste - Busca em Largura 3x3
+    puzzle.shuffle(1000000);
+    puzzle.printState();
+    auto start2 = chrono::steady_clock::now();
+    if(!puzzle.breadthFirstSearch()){
+        cout << "solution invalid." << endl;
+    }
+    auto end2 = chrono::steady_clock::now();
+    auto diff2 = end2 - start2;
+    cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
+
+
 
     // int opt = getchar();
     // while (opt != int('q'))
@@ -49,8 +76,9 @@ int main()
     //         cout << "unknown\n";
     //     }
     //     puzzle.printState();
+    //     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Descartar o caractere de nova linha (\n)
     //     opt = getchar();
     // }
 
-   // puzzle.printState();
+    // puzzle.printState();
 }
