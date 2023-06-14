@@ -23,33 +23,52 @@ int main()
                 {4, 5, 6},
                 {7, 8, 0}});
 
-    // Teste - Backtracking 3x3
-    auto start = chrono::steady_clock::now();
+    // Teste - Backtracking 
+    // auto start = chrono::steady_clock::now();
+    // puzzle.shuffle(1000000);
+    // puzzle.printState();
+    // int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
+    // float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
+    // float depthLimit = K * distance;
+    // cout << depthLimit << endl;
+    // if (!puzzle.backTracking(depthLimit)){
+    //     cout << "solution invalid." << endl;
+    // }
+    // auto end = chrono::steady_clock::now();
+    // auto diff = end - start;
+    // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+
+    // Teste - Busca em Largura 
     puzzle.shuffle(1000000);
     puzzle.printState();
-    int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
-    float K = 3; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
-    float depthLimit = K * distance;
-    cout << depthLimit << endl;
-    if (!puzzle.backTracking(depthLimit)){
-        cout << "solution invalid." << endl;
+    if(puzzle.checkParity()){
+        auto start2 = chrono::steady_clock::now();
+        if(!puzzle.breadthFirstSearch()){
+            cout << "solution invalid." << endl;
+        }
+        auto end2 = chrono::steady_clock::now();
+        auto diff2 = end2 - start2;
+        cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
     }
-    auto end = chrono::steady_clock::now();
-    auto diff = end - start;
-    cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+    else
+        cout << "solution invalid. Parity ímpar." <<endl;
 
-    // Teste - Busca em Largura 3x3
-    puzzle.shuffle(1000000);
-    puzzle.printState();
-    auto start2 = chrono::steady_clock::now();
-    if(!puzzle.breadthFirstSearch()){
-        cout << "solution invalid." << endl;
-    }
-    auto end2 = chrono::steady_clock::now();
-    auto diff2 = end2 - start2;
-    cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
-
-
+    // Teste - Busca em profundidade
+    // puzzle.shuffle(1000000);
+    // puzzle.printState();
+    // if(puzzle.checkParity()){
+    //     auto start3 = chrono::steady_clock::now();
+    //     if(!puzzle.iterativeDeepeningSearch(40)){
+    //         cout << "solution invalid." << endl;
+    //     }
+    //     auto end3 = chrono::steady_clock::now();
+    //     auto diff3 = end3 - start3;
+    //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
+    // }
+    // else{
+    //     cout << "solution invalid.Parity impar" << endl;
+    // }
+   
 
     // int opt = getchar();
     // while (opt != int('q'))

@@ -7,7 +7,7 @@
 #include <string>
 #include <stdlib.h>
 #include <queue>
-#include <chrono>
+#include <stack>
 #include <unordered_set>
 using namespace std;
 
@@ -170,6 +170,28 @@ vector<vector<int>> Puzzle::getStateFromString(const string& stateString)
 
     return aux_state;
 }
+bool Puzzle::checkParity(){
+     string stateString = convertStateToString(this->state);
+    int inversions = 0;
+    
+    for (size_t i = 0; i < stateString.size(); i++)
+    {
+        for (size_t j = i + 1; j < stateString.size(); j++)
+        {
+            if (stateString[j] != '0' && stateString[i] != '0' && stateString[i] > stateString[j])
+                inversions++;
+        }
+    }
+    
+    if (inversions % 2 == 0){
+        cout << "Parity: Par" << endl;
+        return true;    
+    }
+    else
+        cout << "Parity: Ímpar" << endl;
+    return false;
+}
+
 bool Puzzle::backTracking(int depthLimit)
 {   
     if (this->state == this->goalState)
@@ -205,44 +227,163 @@ bool Puzzle::backTracking(int depthLimit)
     return false; 
 }
 
+// bool Puzzle::breadthFirstSearch()
+// {
+//     queue<Puzzle> openList;
+//    // unordered_set<string> closedList;
+//     unordered_set<string> statesVisited;
+//     openList.push(*this);
+//     statesVisited.insert(convertStateToString(this->state));
+//     while (!openList.empty())
+//     {
+//         Puzzle currentPuzzle = openList.front();
+//         openList.pop();
+        
+//         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+//         for (pair<int, int> movement : movements)
+//         {
+//             Puzzle childPuzzle = currentPuzzle;
+            
+//             if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+//             {
+//                 string childStateString = convertStateToString(childPuzzle.state);
+//                 if (visitedStates.find(childStateString) == visitedStates.end())
+//                 {
+//                     this->moves += 1;
+//                     openList.push(childPuzzle);
+//                     visitedStates.insert(childStateString);
+//                 }
+//             }
+//         }
+//        // closedList.insert(convertStateToString(currentPuzzle.state));
+//         if (currentPuzzle.state == goalState)
+//         {
+//             cout << "Solution found:" << endl;
+//             currentPuzzle.printState();
+//             cout << "Moves: "<< this->moves << endl;
+//             return true;
+//         }
+//     }
+    
+//     return false;
+// }
 bool Puzzle::breadthFirstSearch()
 {
-    queue<Puzzle> openList;
-    unordered_set<string> closedList;
-    openList.push(*this);
-
+    queue<string> openList;
+   // unordered_set<string> closedList;
+    unordered_set<string> statesVisited;
+    openList.push(convertStateToString(this->state));
+    statesVisited.insert(convertStateToString(this->state));
     while (!openList.empty())
     {
-        Puzzle currentPuzzle = openList.front();
+        string currentPuzzle = openList.front();
         openList.pop();
-        if (currentPuzzle.state == goalState)
-        {
-            cout << "Solution found:" << endl;
-            currentPuzzle.printState();
-            cout << "Moves: "<< this->moves << endl;
-            return true;
+        this->state.clear();
+        vector<vector<int>> currentState = getStateFromString(currentPuzzle);
+        for (const auto& vetor_interno : currentState) {
+            this->state.push_back(vetor_interno);
         }
+        cout << endl <<  "current state: " << currentPuzzle << endl;
+        printState();
         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
         for (pair<int, int> movement : movements)
         {
-            Puzzle childPuzzle = currentPuzzle;
-            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+            Puzzle aux = *this;
+            aux.state = currentState;
+            cout << "aux State: ";
+            aux.printState();
+            if (aux.safelyMoveZero({movement.first, movement.second}))
             {
-                if (closedList.find(convertStateToString(childPuzzle.state)) == closedList.end())
+                string childStringPuzzle = convertStateToString(aux.state);
+                cout << "childStringPuzzle: " << childStringPuzzle << endl;
+                //printState();
+                if (visitedStates.find(childStringPuzzle) == visitedStates.end())
                 {
                     this->moves += 1;
-                    openList.push(childPuzzle);
+                    openList.push(childStringPuzzle);
+                    visitedStates.insert(childStringPuzzle);
                 }
-               //childPuzzle.safelyMoveZero({-movement.first, -movement.second});
             }
         }
-        closedList.insert(convertStateToString(currentPuzzle.state));
+
+        if (currentPuzzle == convertStateToString(goalState))
+        {
+            cout << "Solution found:" << endl;
+            printState();
+            cout << "Moves: "<< this->moves << endl;
+            return true;
+        }
     }
     
     return false;
 }
+bool Puzzle::depthLimitedSearch(int depthLimit)
+{
+    string currentStateString = convertStateToString(this->state);
+    if (currentStateString == convertStateToString(this->goalState))
+        return true;
 
+    if (depthLimit <= 0)
+        return false;
 
+    closedList.insert(currentStateString);
+    
+    vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
 
+    for (pair<int, int> movement : movements)
+    {
+        if (validZeroMovement(movement))
+        {
+            moveZero(movement);
+           // printState();
+            string nextStateString = convertStateToString(this->state);
+            if (closedList.find(nextStateString) == closedList.end())
+            {
+                this->moves += 1;
+                openList.push(nextStateString);
+                if (depthLimitedSearch(depthLimit - 1))
+                    return true;
+            }
+            moveZero({-movement.first, -movement.second});
+        }
+    }
+
+    return false;
+}
+
+bool Puzzle::iterativeDeepeningSearch(int maxDepth)
+{
+    for (int depthLimit = 0; depthLimit <= maxDepth; depthLimit++)
+    {
+        closedList.clear();
+        openList = stack<string>();
+        
+        openList.push(convertStateToString(this->state));
+
+        while (!openList.empty())
+        {
+            string currentStateString = openList.top();
+            openList.pop();
+            getStateFromString(currentStateString);
+
+            if (currentStateString == convertStateToString(this->goalState)){
+                this->printState();
+                return true;
+            
+            }
+
+            closedList.insert(currentStateString);
+            if (depthLimitedSearch(depthLimit)){
+                this->printState();
+                cout << "DepthLimit: " << depthLimit << endl;
+                cout << "moves: " << this->moves << endl;
+                return true;
+                break;
+            }
+        }
+    }
+
+    return false;
+}
 
 

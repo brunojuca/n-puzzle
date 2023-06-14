@@ -2,6 +2,8 @@
 #define PUZZLE_H
 
 #include <vector>
+#include <stack>
+#include <unordered_set>
 #include <set>
 #include <string>
 #include <cmath>
@@ -20,6 +22,9 @@ private:
     vector<vector<int>> state;
     vector<vector<int>> goalState;
     set<string> visitedStates;
+    stack<string> openList;
+    unordered_set<string> closedList;
+
     int moves;
     pair<int, int> zeroPos = make_pair(0, 0);
     int dimension;
@@ -41,14 +46,13 @@ public:
     vector<vector<int>> getStateFromString(const string& stateString); // converte a string em matriz
     int manhattanDistance(); // Heurística: calcula a distância de manhattan que mede a soma das distâncias horizontais e verticais entre cada peça e sua posição final desejada.
     void findGoalPosition(int value, int& row, int& col); //  encontrar a posição correta de cada número no estado objetivo.
+    bool checkParity(); // checa paridade
 
     // funções principais
-    bool breadthFirstSearch();
     bool backTracking(int dephtLimit); // backTracking
-    
-    
-   
-    
+    bool breadthFirstSearch(); // busca em largura
+    bool depthLimitedSearch(int depthLimit); // busca em profundidade limitada
+    bool iterativeDeepeningSearch(int maxDepth); // busca em profunidade iterativa
     
 
 };
