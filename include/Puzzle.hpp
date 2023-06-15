@@ -47,7 +47,8 @@ public:
     int manhattanDistance(); // Heurística: calcula a distância de manhattan que mede a soma das distâncias horizontais e verticais entre cada peça e sua posição final desejada.
     void findGoalPosition(int value, int& row, int& col); //  encontrar a posição correta de cada número no estado objetivo.
     bool checkParity(); // checa paridade
-    vector<vector<int>> getState();
+    vector<vector<int>> getState(); // retorna o estado
+    int cost(); // retorna a quantidade de peças fora do lugar - Custo
 
     // funções principais
     bool backTracking(int dephtLimit); // backTracking
@@ -56,6 +57,7 @@ public:
     bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
     bool orderedSearch(); // busca ordenada
     bool greedySearch(); // busca gulosa
+    bool AstarSearch(); // Busca A*
 };
 
 #endif

@@ -191,6 +191,24 @@ bool Puzzle::checkParity(){
         cout << "Parity: Ímpar" << endl;
     return false;
 }
+vector<vector<int>> Puzzle::getState(){
+    return this->state;
+}
+int Puzzle::cost() // retorna a quantidade de peçasfora do lugar
+{
+    int count = 0;
+    for (int i = 0; i < this->dimension; i++)
+    {
+        for (int j = 0; j < this->dimension; j++)
+        {
+            if (state[i][j] != goalState[i][j])
+            {
+                count++;
+            }
+        }
+    }
+    return count;
+}
 
 bool Puzzle::backTracking(int depthLimit)
 {   
@@ -384,9 +402,7 @@ bool Puzzle::iterativeDepthSearch(int maxDepth)
 
     return false;
 }
-vector<vector<int>> Puzzle::getState(){
-    return this->state;
-}
+
 bool Puzzle::orderedSearch()
 {
     struct PuzzleNode {
@@ -403,7 +419,7 @@ bool Puzzle::orderedSearch()
     priority_queue<PuzzleNode> openList;
     unordered_set<string> closedList;
 
-    openList.push({*this, manhattanDistance(), 0}); // O custo total acumulado inicial é 0
+    openList.push({*this, cost(), 0}); // O custo total acumulado inicial é 0
 
     while (!openList.empty())
     {
@@ -431,8 +447,9 @@ bool Puzzle::orderedSearch()
                 if (closedList.find(childStateString) == closedList.end())
                 {
                     childPuzzle.moves++;
-                    int childAccumulatedCost = currentNode.accumulatedCost + currentNode.cost; // Atualiza o custo total acumulado com o custo do nó atual
-                    openList.push({childPuzzle, childPuzzle.manhattanDistance(), childAccumulatedCost});
+                    int childAccumulatedCost = currentNode.accumulatedCost + childPuzzle.cost(); // Atualiza o custo total acumulado com o custo do nó atual
+                    cout << childAccumulatedCost << endl;
+                    openList.push({childPuzzle, childPuzzle.cost(), childAccumulatedCost});
                 }
             }
         }
@@ -484,6 +501,56 @@ bool Puzzle::greedySearch()
                 {
                     currentPuzzle.moves++;
                     openList.push({childPuzzle, childPuzzle.manhattanDistance()});
+                }
+            }
+        }
+    }
+    return false;
+}
+bool Puzzle::AstarSearch()
+{
+    struct PuzzleNode {
+        Puzzle puzzle;
+        int heuristic;
+        int cost;
+
+        bool operator<(const PuzzleNode& other) const
+        {
+            return heuristic + cost > other.heuristic + cost; // Ordena em ordem crescente do custo
+        }
+    };
+
+    priority_queue<PuzzleNode> openList;
+    unordered_set<string> closedList;
+
+    openList.push({*this, manhattanDistance(), cost()});
+    while (!openList.empty())
+    {
+        PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
+        openList.pop();
+        Puzzle currentPuzzle = currentNode.puzzle;
+        string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
+        if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
+        {
+            cout << "Solution found:" << endl;
+            currentPuzzle.printState();
+            cout << "Moves: " << currentPuzzle.moves << endl;
+            return true;
+        }
+
+        closedList.insert(currentStateString);
+
+        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+        for (pair<int, int> movement : movements)
+        {
+            Puzzle childPuzzle = currentPuzzle;
+            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+            {
+                string childStateString = childPuzzle.convertStateToString(childPuzzle.getState());
+                if (closedList.find(childStateString) == closedList.end())
+                {
+                    currentPuzzle.moves++;
+                    openList.push({childPuzzle, childPuzzle.manhattanDistance(), childPuzzle.cost()});
                 }
             }
         }

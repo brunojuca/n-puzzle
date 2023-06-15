@@ -17,22 +17,22 @@ int main()
     //             {11, 12, 13, 14, 15},
     //             {16, 17, 18, 19, 20},
     //             {21, 22, 23, 24, 0}});
-    // Puzzle puzzle({{1, 2, 3, 4},
-    //                {5, 6, 7, 8},
-    //                {9, 10, 11, 12},
-    //                {13, 14, 15, 0}},
+    Puzzle puzzle({{1, 2, 3, 4},
+                   {5, 6, 7, 8},
+                   {9, 10, 11, 12},
+                   {13, 14, 15, 0}},
 
-    //               {{1, 2, 3, 4},
-    //                {5, 6, 7, 8},
-    //                {9, 10, 11, 12},
-    //                {13, 14, 15, 0}});
- Puzzle puzzle({{1, 2, 3},
-                {4, 5, 6},
-                {7, 8, 0}},
+                  {{1, 2, 3, 4},
+                   {5, 6, 7, 8},
+                   {9, 10, 11, 12},
+                   {13, 14, 15, 0}});
+//  Puzzle puzzle({{1, 2, 3},
+//                 {4, 5, 6},
+//                 {7, 8, 0}},
 
-                {{1, 2, 3},
-                {4, 5, 6},
-                {7, 8, 0}});
+//                 {{1, 2, 3},
+//                 {4, 5, 6},
+//                 {7, 8, 0}});
 
     // -------------------------------------------------- BackTracking --------------------------------------------- 
     // auto start = chrono::steady_clock::now();
@@ -80,26 +80,41 @@ int main()
     //     cout << "solution invalid.Parity unpaired" << endl;
     // }
     // -------------------------------------------------- Busca Ordenada ---------------------------------------------
-    puzzle.shuffle(1000000);
-    puzzle.printState();
-    if(puzzle.checkParity()){
-        auto start3 = chrono::steady_clock::now();
-        if(!puzzle.orderedSearch()){
-            cout << "solution invalid." << endl;
-        }
-        auto end3 = chrono::steady_clock::now();
-        auto diff3 = end3 - start3;
-        cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
-    }
-    else{
-        cout << "solution invalid.Parity unpaired" << endl;
-    }
+    // puzzle.shuffle(1000000);
+    // puzzle.printState();
+    // if(puzzle.checkParity()){
+    //     auto start3 = chrono::steady_clock::now();
+    //     if(!puzzle.orderedSearch()){
+    //         cout << "solution invalid." << endl;
+    //     }
+    //     auto end3 = chrono::steady_clock::now();
+    //     auto diff3 = end3 - start3;
+    //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
+    // }
+    // else{
+    //     cout << "solution invalid.Parity unpaired" << endl;
+    // }
     // -------------------------------------------------- Busca Gulosa ---------------------------------------------
     puzzle.shuffle(1000000);
     puzzle.printState();
     if(puzzle.checkParity()){
         auto start = chrono::steady_clock::now();
         if(!puzzle.greedySearch()){
+            cout << "solution invalid." << endl;
+        }
+        auto end = chrono::steady_clock::now();
+        auto diff = end - start;
+        cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+    }
+    else{
+        cout << "solution invalid.Parity unpaired" << endl;
+    }
+      // -------------------------------------------------- Busca A* ---------------------------------------------
+    puzzle.shuffle(1000000);
+    puzzle.printState();
+    if(puzzle.checkParity()){
+        auto start = chrono::steady_clock::now();
+        if(!puzzle.AstarSearch()){
             cout << "solution invalid." << endl;
         }
         auto end = chrono::steady_clock::now();
