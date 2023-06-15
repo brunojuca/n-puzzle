@@ -58,6 +58,7 @@ public:
     bool orderedSearch(); // busca ordenada
     bool greedySearch(); // busca gulosa
     bool AstarSearch(); // Busca A*
+    bool IDAstarSearch(); // Busca IDA*
 };
 
 #endif

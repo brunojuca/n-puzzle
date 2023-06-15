@@ -6,26 +6,26 @@ using namespace std;
 
 int main()
 {
-    // Puzzle puzzle({{1, 2, 3, 4, 5},
-    //             {6, 7, 8, 9, 10},
-    //             {11, 12, 13, 14, 15},
-    //             {16, 17, 18, 19, 20},
-    //             {21, 22, 23, 24, 0}},
+    Puzzle puzzle({{1, 2, 3, 4, 5},
+                {6, 7, 8, 9, 10},
+                {11, 12, 13, 14, 15},
+                {16, 17, 18, 19, 20},
+                {21, 22, 23, 24, 0}},
 
-    //             {{1, 2, 3, 4, 5},
-    //             {6, 7, 8, 9, 10},
-    //             {11, 12, 13, 14, 15},
-    //             {16, 17, 18, 19, 20},
-    //             {21, 22, 23, 24, 0}});
-    Puzzle puzzle({{1, 2, 3, 4},
-                   {5, 6, 7, 8},
-                   {9, 10, 11, 12},
-                   {13, 14, 15, 0}},
+                {{1, 2, 3, 4, 5},
+                {6, 7, 8, 9, 10},
+                {11, 12, 13, 14, 15},
+                {16, 17, 18, 19, 20},
+                {21, 22, 23, 24, 0}});
+    // Puzzle puzzle({{1, 2, 3, 4},
+    //                {5, 6, 7, 8},
+    //                {9, 10, 11, 12},
+    //                {13, 14, 15, 0}},
 
-                  {{1, 2, 3, 4},
-                   {5, 6, 7, 8},
-                   {9, 10, 11, 12},
-                   {13, 14, 15, 0}});
+    //               {{1, 2, 3, 4},
+    //                {5, 6, 7, 8},
+    //                {9, 10, 11, 12},
+    //                {13, 14, 15, 0}});
 //  Puzzle puzzle({{1, 2, 3},
 //                 {4, 5, 6},
 //                 {7, 8, 0}},
@@ -115,6 +115,21 @@ int main()
     if(puzzle.checkParity()){
         auto start = chrono::steady_clock::now();
         if(!puzzle.AstarSearch()){
+            cout << "solution invalid." << endl;
+        }
+        auto end = chrono::steady_clock::now();
+        auto diff = end - start;
+        cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+    }
+    else{
+        cout << "solution invalid.Parity unpaired" << endl;
+    }
+        // -------------------------------------------------- Busca IDA* ---------------------------------------------
+    puzzle.shuffle(1000000);
+    puzzle.printState();
+    if(puzzle.checkParity()){
+        auto start = chrono::steady_clock::now();
+        if(!puzzle.IDAstarSearch()){
             cout << "solution invalid." << endl;
         }
         auto end = chrono::steady_clock::now();

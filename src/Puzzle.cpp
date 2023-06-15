@@ -557,3 +557,75 @@ bool Puzzle::AstarSearch()
     }
     return false;
 }
+
+bool Puzzle::IDAstarSearch()
+{
+    struct PuzzleNode {
+        Puzzle puzzle;
+        int heuristic;
+        int cost;
+
+        bool operator<(const PuzzleNode& other) const
+        {
+            return heuristic + cost > other.heuristic + other.cost; // Ordena em ordem crescente do custo total
+        }
+    };
+
+    int patamar = manhattanDistance(); // Limite inicial é a heurística do estado inicial
+    while (true)
+    {
+        int nextPatamar = INT_MAX; // Próximo limite é infinito
+        
+        priority_queue<PuzzleNode> openList;
+        unordered_set<string> closedList;
+
+        openList.push({*this, manhattanDistance(), 0});
+
+        while (!openList.empty())
+        {
+            PuzzleNode currentNode = openList.top();
+            openList.pop();
+            Puzzle currentPuzzle = currentNode.puzzle;
+            string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
+
+            if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
+            {
+                cout << "Solution found:" << endl;
+                currentPuzzle.printState();
+                cout << "Moves: " << currentPuzzle.moves << endl;
+                return true;
+            }
+
+            if (currentNode.heuristic + currentNode.cost > patamar)
+            {
+                // Atualiza o próximo limite com o menor custo do caminho que excede o limite atual
+                nextPatamar = min(nextPatamar, currentNode.heuristic + currentNode.cost);
+                continue;
+            }
+
+            closedList.insert(currentStateString);
+
+            vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+            for (pair<int, int> movement : movements)
+            {
+                Puzzle childPuzzle = currentPuzzle;
+                if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+                {
+                    string childStateString = childPuzzle.convertStateToString(childPuzzle.getState());
+                    if (closedList.find(childStateString) == closedList.end())
+                    {
+                        childPuzzle.moves++;
+                        openList.push({childPuzzle, childPuzzle.manhattanDistance(), childPuzzle.cost()});
+                    }
+                }
+            }
+        }
+
+        if (nextPatamar == INT_MAX)
+            return false; // Nenhum caminho encontrado até o próximo limite
+
+        patamar = nextPatamar; // Atualiza o limite para o próximo limite calculado
+    }
+
+    return false;
+}
