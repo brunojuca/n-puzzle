@@ -54,8 +54,8 @@ public:
     bool breadthFirstSearch(); // busca em largura
     bool depthLimitedSearch(int depthLimit); // busca em profundidade limitada
     bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
-    bool orderedSearch();
-
+    bool orderedSearch(); // busca ordenada
+    bool greedySearch(); // busca gulosa
 };
 
 #endif

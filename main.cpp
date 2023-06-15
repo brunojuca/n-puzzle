@@ -6,17 +6,17 @@ using namespace std;
 
 int main()
 {
-    Puzzle puzzle({{1, 2, 3, 4, 5},
-                {6, 7, 8, 9, 10},
-                {11, 12, 13, 14, 15},
-                {16, 17, 18, 19, 20},
-                {21, 22, 23, 24, 0}},
+    // Puzzle puzzle({{1, 2, 3, 4, 5},
+    //             {6, 7, 8, 9, 10},
+    //             {11, 12, 13, 14, 15},
+    //             {16, 17, 18, 19, 20},
+    //             {21, 22, 23, 24, 0}},
 
-                {{1, 2, 3, 4, 5},
-                {6, 7, 8, 9, 10},
-                {11, 12, 13, 14, 15},
-                {16, 17, 18, 19, 20},
-                {21, 22, 23, 24, 0}});
+    //             {{1, 2, 3, 4, 5},
+    //             {6, 7, 8, 9, 10},
+    //             {11, 12, 13, 14, 15},
+    //             {16, 17, 18, 19, 20},
+    //             {21, 22, 23, 24, 0}});
     // Puzzle puzzle({{1, 2, 3, 4},
     //                {5, 6, 7, 8},
     //                {9, 10, 11, 12},
@@ -26,15 +26,15 @@ int main()
     //                {5, 6, 7, 8},
     //                {9, 10, 11, 12},
     //                {13, 14, 15, 0}});
-//  Puzzle puzzle({{1, 2, 3},
-//                 {4, 5, 6},
-//                 {7, 8, 0}},
+ Puzzle puzzle({{1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}},
 
-//                 {{1, 2, 3},
-//                 {4, 5, 6},
-//                 {7, 8, 0}});
+                {{1, 2, 3},
+                {4, 5, 6},
+                {7, 8, 0}});
 
-    // Teste - Backtracking 
+    // -------------------------------------------------- BackTracking --------------------------------------------- 
     // auto start = chrono::steady_clock::now();
     // puzzle.shuffle(1000000);
     // puzzle.printState();
@@ -49,7 +49,7 @@ int main()
     // auto diff = end - start;
     // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
 
-    // Teste - Busca em Largura 
+    // -------------------------------------------------- Busca em Largura ---------------------------------------------
     // puzzle.shuffle(1000000);
     // puzzle.printState();
     // if(puzzle.checkParity()){
@@ -64,7 +64,7 @@ int main()
     // else
     //     cout << "solution invalid. Parity unpaired." <<endl;
 
-    // Teste - Busca em profundidade
+    // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
     // puzzle.shuffle(1000000);
     // puzzle.printState();
     // if(puzzle.checkParity()){
@@ -79,7 +79,7 @@ int main()
     // else{
     //     cout << "solution invalid.Parity unpaired" << endl;
     // }
-    // Teste - Busca Ordenada
+    // -------------------------------------------------- Busca Ordenada ---------------------------------------------
     puzzle.shuffle(1000000);
     puzzle.printState();
     if(puzzle.checkParity()){
@@ -94,7 +94,21 @@ int main()
     else{
         cout << "solution invalid.Parity unpaired" << endl;
     }
-
+    // -------------------------------------------------- Busca Gulosa ---------------------------------------------
+    puzzle.shuffle(1000000);
+    puzzle.printState();
+    if(puzzle.checkParity()){
+        auto start = chrono::steady_clock::now();
+        if(!puzzle.greedySearch()){
+            cout << "solution invalid." << endl;
+        }
+        auto end = chrono::steady_clock::now();
+        auto diff = end - start;
+        cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+    }
+    else{
+        cout << "solution invalid.Parity unpaired" << endl;
+    }
     // int opt = getchar();
     // while (opt != int('q'))
     // {

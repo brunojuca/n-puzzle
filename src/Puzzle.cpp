@@ -392,10 +392,64 @@ bool Puzzle::orderedSearch()
     struct PuzzleNode {
         Puzzle puzzle;
         int cost;
+        int accumulatedCost; // Custo total acumulado até o nó atual
 
         bool operator<(const PuzzleNode& other) const
         {
-            return cost > other.cost; // Ordena em ordem crescente do custo
+            return accumulatedCost > other.accumulatedCost; // Ordena em ordem crescente do custo total
+        }
+    };
+
+    priority_queue<PuzzleNode> openList;
+    unordered_set<string> closedList;
+
+    openList.push({*this, manhattanDistance(), 0}); // O custo total acumulado inicial é 0
+
+    while (!openList.empty())
+    {
+        PuzzleNode currentNode = openList.top();
+        openList.pop();
+        Puzzle currentPuzzle = currentNode.puzzle;
+        string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
+
+        if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
+        {
+            cout << "Solution found:" << endl;
+            currentPuzzle.printState();
+            cout << "Moves: " << currentPuzzle.moves << endl;
+            return true;
+        }
+        closedList.insert(currentStateString);
+
+        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+        for (pair<int, int> movement : movements)
+        {
+            Puzzle childPuzzle = currentPuzzle;
+            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+            {
+                string childStateString = childPuzzle.convertStateToString(childPuzzle.getState());
+                if (closedList.find(childStateString) == closedList.end())
+                {
+                    childPuzzle.moves++;
+                    int childAccumulatedCost = currentNode.accumulatedCost + currentNode.cost; // Atualiza o custo total acumulado com o custo do nó atual
+                    openList.push({childPuzzle, childPuzzle.manhattanDistance(), childAccumulatedCost});
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool Puzzle::greedySearch()
+{
+    struct PuzzleNode {
+        Puzzle puzzle;
+        int heuristic;
+
+        bool operator<(const PuzzleNode& other) const
+        {
+            return heuristic > other.heuristic; // Ordena em ordem crescente do custo
         }
     };
 
@@ -434,7 +488,5 @@ bool Puzzle::orderedSearch()
             }
         }
     }
-
     return false;
 }
-
