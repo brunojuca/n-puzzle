@@ -38,10 +38,10 @@ Puzzle::~Puzzle()
 
 void Puzzle::printState()
 {
-    cout << endl;
-    cout << "Dimension: " << this->dimension << endl;
-    cout << "Zero position: (" << this->zeroPos.first << ", " << this->zeroPos.second << ")" << endl;
-    cout << endl;
+    //cout << endl;
+   // cout << "Dimension: " << this->dimension << endl;
+   // cout << "Zero position: (" << this->zeroPos.first << ", " << this->zeroPos.second << ")" << endl;
+   // cout << endl;
     for (vector row : this->state)
     {
         for (int num : row)
@@ -351,7 +351,7 @@ bool Puzzle::depthLimitedSearch(int depthLimit)
     return false;
 }
 
-bool Puzzle::iterativeDeepeningSearch(int maxDepth)
+bool Puzzle::iterativeDepthSearch(int maxDepth)
 {
     for (int depthLimit = 0; depthLimit <= maxDepth; depthLimit++)
     {
@@ -359,7 +359,6 @@ bool Puzzle::iterativeDeepeningSearch(int maxDepth)
         openList = stack<string>();
         
         openList.push(convertStateToString(this->state));
-
         while (!openList.empty())
         {
             string currentStateString = openList.top();
@@ -385,5 +384,57 @@ bool Puzzle::iterativeDeepeningSearch(int maxDepth)
 
     return false;
 }
+vector<vector<int>> Puzzle::getState(){
+    return this->state;
+}
+bool Puzzle::orderedSearch()
+{
+    struct PuzzleNode {
+        Puzzle puzzle;
+        int cost;
 
+        bool operator<(const PuzzleNode& other) const
+        {
+            return cost > other.cost; // Ordena em ordem crescente do custo
+        }
+    };
+
+    priority_queue<PuzzleNode> openList;
+    unordered_set<string> closedList;
+
+    openList.push({*this, manhattanDistance()});
+    while (!openList.empty())
+    {
+        PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
+        openList.pop();
+        Puzzle currentPuzzle = currentNode.puzzle;
+        string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
+        if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
+        {
+            cout << "Solution found:" << endl;
+            currentPuzzle.printState();
+            cout << "Moves: " << currentPuzzle.moves << endl;
+            return true;
+        }
+
+        closedList.insert(currentStateString);
+
+        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+        for (pair<int, int> movement : movements)
+        {
+            Puzzle childPuzzle = currentPuzzle;
+            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
+            {
+                string childStateString = childPuzzle.convertStateToString(childPuzzle.getState());
+                if (closedList.find(childStateString) == closedList.end())
+                {
+                    currentPuzzle.moves++;
+                    openList.push({childPuzzle, childPuzzle.manhattanDistance()});
+                }
+            }
+        }
+    }
+
+    return false;
+}
 
