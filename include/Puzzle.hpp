@@ -7,6 +7,7 @@
 #include <set>
 #include <string>
 #include <cmath>
+#include <map>
 using namespace std;
 
 namespace movement
@@ -21,13 +22,17 @@ class Puzzle
 private:
     vector<vector<int>> state;
     vector<vector<int>> goalState;
-    set<string> visitedStates;
-    stack<string> openList;
-    unordered_set<string> closedList;
+    set<string> visitedStates2;
+    // stack<vector<vector<int>>> openList;
+    // set<vector<vector<int>>> visitedStates;
 
+    stack<string> openList;
+    set<string> closedList;
     int moves;
     pair<int, int> zeroPos = make_pair(0, 0);
     int dimension;
+    int n;
+    int m;
     void setZeroPosition();
 
     
@@ -36,6 +41,7 @@ public:
     Puzzle(vector<vector<int>> state, vector<vector<int>> goalState);
     ~Puzzle();
     void printState();
+    void printState2(const vector<vector<int>>& puzzleState)const;
     bool validZeroMovement(pair<int, int> movement);
     void moveZero(pair<int, int> movement);
     bool safelyMoveZero(pair<int, int> movement);
@@ -49,9 +55,12 @@ public:
     bool checkParity(); // checa paridade
     vector<vector<int>> getState(); // retorna o estado
     int cost(); // retorna a quantidade de peças fora do lugar - Custo
+    
 
     // funções principais
-    bool backTracking(int dephtLimit); // backTracking
+    bool backTracking(int dephtLimit);
+    bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 
+    vector<vector<int>>> parentMap, int &nodesExpanded, int depth,  set<vector<vector<int>>> &openList, set<vector<vector<int>>> &visitedStates); // backTracking
     bool breadthFirstSearch(); // busca em largura
     bool depthLimitedSearch(int depthLimit); // busca em profundidade limitada
     bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa

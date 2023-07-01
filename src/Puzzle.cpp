@@ -9,24 +9,27 @@
 #include <queue>
 #include <stack>
 #include <unordered_set>
+#include <map>
+#include <sstream>
 using namespace std;
 
 Puzzle::Puzzle(vector<vector<int>> state, vector<vector<int>> goalState)
 {
     for (vector<int> row : state)
-        if (row.size() != state.size())
+        if (row.size() != state[0].size())
             throw invalid_argument("The state vector must have 2 dimensions of same size");
 
     for (vector<int> row : goalState)
-        if (row.size() != goalState.size())
+        if (row.size() != goalState[0].size())
             throw invalid_argument("The goal state vector must have 2 dimensions of same size");
 
-    if (state.size() != goalState.size())
+    if (state.size() != goalState.size() || state[0].size() != goalState[0].size())
             throw invalid_argument("The state vector and the goal state vector must have equal dimensions");
 
     this->state = state;
     this->goalState = goalState;
-    this->dimension = state.size();
+    this->n = state.size();
+    this->m = state[0].size();;
     this->setZeroPosition();
     this->moves = 0;
 }
@@ -52,11 +55,22 @@ void Puzzle::printState()
     }
     cout << endl;
 }
+void Puzzle::printState2(const vector<vector<int>>& puzzleState) const
+{
+    for (const auto& row : puzzleState)
+    {
+        for (const auto& num : row)
+        {
+            cout << num << " ";
+        }
+        cout << endl;
+    }
+}
 
 void Puzzle::setZeroPosition()
 {
-    for (size_t i = 0; i < this->dimension; i++)
-        for (size_t j = 0; j < this->dimension; j++)
+    for (size_t i = 0; i < this->n; i++)
+        for (size_t j = 0; j < this->m; j++)
         {
             if (this->state[i][j] == 0)
             {
@@ -70,7 +84,7 @@ void Puzzle::setZeroPosition()
 bool Puzzle::validZeroMovement(pair<int, int> movement)
 {
     pair<int, int> newPos = pair<int, int>(this->zeroPos.first + movement.first, this->zeroPos.second + movement.second);
-    if (newPos.first >= 0 && newPos.first < this->dimension && newPos.second >= 0 && newPos.second < this->dimension)
+    if (newPos.first >= 0 && newPos.first < this->n && newPos.second >= 0 && newPos.second < this->m)
         return true;
     return false;
 }
@@ -86,7 +100,7 @@ void Puzzle::moveZero(pair<int, int> movement)
 bool Puzzle::safelyMoveZero(pair<int, int> movement)
 {
     pair<int, int> newPos = pair<int, int>(this->zeroPos.first + movement.first, this->zeroPos.second + movement.second);
-    if (newPos.first >= 0 && newPos.first < this->dimension && newPos.second >= 0 && newPos.second < this->dimension)
+    if (newPos.first >= 0 && newPos.first < this->n && newPos.second >= 0 && newPos.second < this->m)
     {
         this->state[this->zeroPos.first][this->zeroPos.second] = this->state[newPos.first][newPos.second];
         this->state[newPos.first][newPos.second] = 0;
@@ -119,13 +133,12 @@ string Puzzle::convertStateToString(const vector<vector<int>>& state)
     }
     return stateString;
 }
+
 // Heurística
 int Puzzle::manhattanDistance() { 
         int distance = 0;
-        int dimension = state.size();
-
-        for (int i = 0; i < dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
+        for (int i = 0; i < this->n; i++) {
+            for (int j = 0; j < this->m; j++) {
                 int value = state[i][j];
                 if (value != 0) {
                     int goalRow, goalCol;
@@ -139,10 +152,10 @@ int Puzzle::manhattanDistance() {
 }
 
 void Puzzle::findGoalPosition(int value, int& row, int& col) { 
-    int dimension = goalState.size();
+    //int dimension = goalState.size();
 
-    for (int i = 0; i < dimension; i++) {
-        for (int j = 0; j < dimension; j++) {
+    for (int i = 0; i < this->n; i++) {
+        for (int j = 0; j < this->m; j++) {
             if (goalState[i][j] == value) {
                 row = i;
                 col = j;
@@ -170,8 +183,11 @@ vector<vector<int>> Puzzle::getStateFromString(const string& stateString)
 
     return aux_state;
 }
+
+
+
 bool Puzzle::checkParity(){
-     string stateString = convertStateToString(this->state);
+    string stateString = convertStateToString(this->state);
     int inversions = 0;
     
     for (size_t i = 0; i < stateString.size(); i++)
@@ -197,9 +213,9 @@ vector<vector<int>> Puzzle::getState(){
 int Puzzle::cost() // retorna a quantidade de peçasfora do lugar
 {
     int count = 0;
-    for (int i = 0; i < this->dimension; i++)
+    for (int i = 0; i < this->n; i++)
     {
-        for (int j = 0; j < this->dimension; j++)
+        for (int j = 0; j < this->m; j++)
         {
             if (state[i][j] != goalState[i][j])
             {
@@ -210,131 +226,165 @@ int Puzzle::cost() // retorna a quantidade de peçasfora do lugar
     return count;
 }
 
-bool Puzzle::backTracking(int depthLimit)
+bool Puzzle::backTracking(int depthLimit){
+    vector<vector<int>> initial = this->state; // armazena o estado inicial;
+    map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
+    set<vector<vector<int>>> openList;
+    set<vector<vector<int>>> visitedStates;
+    int nodesExpanded = 0;
+    parentMap[this->state] = {}; 
+    int depth = 0;
+    return auxBackTracking(depthLimit,initial,parentMap,nodesExpanded, depth, openList, visitedStates);
+}
+
+bool Puzzle::auxBackTracking(int depthLimit, vector<vector<int>> initial,
+ map<vector<vector<int>>, vector<vector<int>>> parentMap, int &nodesExpanded, int depth, set<vector<vector<int>>> &openList,
+     set<vector<vector<int>>> &visitedStates)
 {   
     if (this->state == this->goalState)
     {
         cout << "Solution found:" << endl;
         this->printState();
-        cout << "Moves: " << this->moves << endl;
+        cout << "Nodes Expanded: " << nodesExpanded << endl;
+        cout << "Visited States: " << visitedStates.size() << endl;
+        cout << "Depth: " << depth << endl;
+        //imprimir o caminho
+        vector<vector<vector<int>>> path;
+        while (this->state != initial) { // enquanto o estado atual não chega no estado inicial
+            path.push_back(this->state); // adiciona o estado pai
+            this->state = parentMap[this->state]; // estado atual passa a ser o estado pai
+        }
+        path.push_back(initial);  
+        reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
+        // Imprime o caminho
+        cout << "Path: " << endl;
+        for (const auto& state : path) {
+            printState2(state);
+            cout << endl;
+        }
         return true;
     }
-    if(depthLimit == 0) return false;
+    if(depth == depthLimit) return false;
     vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
-
     for (pair<int, int> movement : movements)
     {
+        vector<vector<int>> currentState = this->state;
         if(this->safelyMoveZero({movement.first, movement.second}))
-        {
-            string stateString = convertStateToString(this->state);
-            
-            if (visitedStates.find(stateString) == visitedStates.end())  // Verifica se o estado já foi visitado
+        { 
+            if(visitedStates.find(this->state) == visitedStates.end()){
+                    visitedStates.insert(this->state);
+            }
+            if (openList.find(this->state) == openList.end())  // Verifica se o estado já foi visitado
             {
-                visitedStates.insert(stateString);  // Adiciona o estado ao conjunto de estados visitados
-                this->moves += 1;
-                if (this->backTracking(depthLimit - 1))
+                parentMap[this->state] = currentState;
+                nodesExpanded++;
+                openList.insert(this->state);
+                  // Adiciona o estado ao conjunto de estados visitados
+                if (auxBackTracking(depthLimit,initial, parentMap, nodesExpanded, depth + 1, openList, visitedStates))
                 {
                     return true;
                 }
-                visitedStates.erase(stateString); 
+                    openList.erase(this->state);
             }
             this->safelyMoveZero({-movement.first, -movement.second});
         }
-        
     }
     return false; 
 }
 
-// bool Puzzle::breadthFirstSearch()
-// {
-//     queue<Puzzle> openList;
-//    // unordered_set<string> closedList;
-//     unordered_set<string> statesVisited;
-//     openList.push(*this);
-//     statesVisited.insert(convertStateToString(this->state));
-//     while (!openList.empty())
-//     {
-//         Puzzle currentPuzzle = openList.front();
-//         openList.pop();
-        
-//         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
-//         for (pair<int, int> movement : movements)
-//         {
-//             Puzzle childPuzzle = currentPuzzle;
-            
-//             if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
-//             {
-//                 string childStateString = convertStateToString(childPuzzle.state);
-//                 if (visitedStates.find(childStateString) == visitedStates.end())
-//                 {
-//                     this->moves += 1;
-//                     openList.push(childPuzzle);
-//                     visitedStates.insert(childStateString);
-//                 }
-//             }
-//         }
-//        // closedList.insert(convertStateToString(currentPuzzle.state));
-//         if (currentPuzzle.state == goalState)
-//         {
-//             cout << "Solution found:" << endl;
-//             currentPuzzle.printState();
-//             cout << "Moves: "<< this->moves << endl;
-//             return true;
-//         }
-//     }
-    
-//     return false;
-// }
 bool Puzzle::breadthFirstSearch()
 {
-    queue<string> openList;
-   // unordered_set<string> closedList;
-    unordered_set<string> statesVisited;
-    openList.push(convertStateToString(this->state));
-    statesVisited.insert(convertStateToString(this->state));
-    while (!openList.empty())
+    queue<vector<vector<int>>> openList; // lista de abertos
+    openList.push(this->state); // adiciona o estado atual na lista de abertos
+    set<vector<vector<int>>> visitedStates;
+    visitedStates.insert(this->state); // marca o estado atual como visitado
+    vector<vector<int>> initial = this->state; // armazena o estado inicial;
+    map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
+    int nodesExpanded = 0;
+    int depth = 0;
+    parentMap[this->state] = {}; 
+    while (!openList.empty()) // enquando a fila nõa está vazia
     {
-        string currentPuzzle = openList.front();
-        openList.pop();
-        this->state.clear();
-        vector<vector<int>> currentState = getStateFromString(currentPuzzle);
-        for (const auto& vetor_interno : currentState) {
-            this->state.push_back(vetor_interno);
-        }
-        cout << endl <<  "current state: " << currentPuzzle << endl;
-        printState();
+        vector<vector<int>> currentPuzzle = openList.front(); // armazena o primeiro da fila
+        visitedStates.insert(currentPuzzle); // marca como visitado
+        openList.pop(); // deleta o primeiro da fila
+        
+        this->state = currentPuzzle; // altera o state da classe para o estado atual
+        setZeroPosition(); // encontra a posição zero.
+
         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
-        for (pair<int, int> movement : movements)
+        for (pair<int, int> movement : movements) // itera sobre todos os movimentos
         {
-            Puzzle aux = *this;
-            aux.state = currentState;
-            cout << "aux State: ";
-            aux.printState();
-            if (aux.safelyMoveZero({movement.first, movement.second}))
+            if (safelyMoveZero({movement.first, movement.second})) // se o movimento é válido
             {
-                string childStringPuzzle = convertStateToString(aux.state);
-                cout << "childStringPuzzle: " << childStringPuzzle << endl;
-                //printState();
-                if (visitedStates.find(childStringPuzzle) == visitedStates.end())
+                if (visitedStates.find(this->state) == visitedStates.end()) // verifica se já foi visitado
                 {
-                    this->moves += 1;
-                    openList.push(childStringPuzzle);
-                    visitedStates.insert(childStringPuzzle);
+                    //this->moves += 1;
+                    nodesExpanded++;
+                    openList.push(this->state); // adiciona na fila de abertos
+                    parentMap[this->state] = currentPuzzle; // armazena os filhos do estado pai
                 }
+                safelyMoveZero({-movement.first, -movement.second}); // desfaz o movimento
             }
         }
-
-        if (currentPuzzle == convertStateToString(goalState))
+        if (currentPuzzle == this->goalState) // se estado atual é o objetivo
         {
             cout << "Solution found:" << endl;
-            printState();
-            cout << "Moves: "<< this->moves << endl;
+            //printState();
+            //cout << "Moves: "<< this->moves << endl;
+            cout << "Nodes Expanded: " << nodesExpanded << endl;
+            cout << "Visited States: " << visitedStates.size() << endl;
+            cout << "Depth: " << depth << endl;
+            // imprimir o caminho
+            vector<vector<vector<int>>> path;
+            while (currentPuzzle != initial) { // enquanto o estado atual não chega no estado inicial
+                path.push_back(currentPuzzle); // adiciona o estado pai
+                currentPuzzle = parentMap[currentPuzzle]; // estado atual passa a ser o estado pai
+            }
+            path.push_back(initial);  
+            reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
+            // Imprime o caminho
+            cout << "Path: " << endl;
+            for (const auto& state : path) {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
     }
-    
     return false;
 }
+// bool Puzzle::iterativeDepthSearch(int maxDepth)
+// {
+//     for (int depthLimit = 0; depthLimit <= maxDepth; depthLimit++)
+//     {
+//         closedList.clear();
+//         openList = stack<string>();
+        
+//         openList.push(this->state);
+//         while (!openList.empty())
+//         {
+//             vector<vector<int>> currentState = openList.top();
+//             openList.pop();
+
+//             if (currentState == this->goalState){
+//                 this->printState();
+//                 return true;
+//             }
+
+//             closedList.insert(currentState);
+//             if (depthLimitedSearch(depthLimit)){
+//                 this->printState();
+//                 cout << "DepthLimit: " << depthLimit << endl;
+//                 cout << "moves: " << this->moves << endl;
+//                 return true;
+//                 break;
+//             }
+//         }
+//     }
+
+//     return false;
+// }
 bool Puzzle::depthLimitedSearch(int depthLimit)
 {
     string currentStateString = convertStateToString(this->state);
@@ -402,7 +452,6 @@ bool Puzzle::iterativeDepthSearch(int maxDepth)
 
     return false;
 }
-
 bool Puzzle::orderedSearch()
 {
     struct PuzzleNode {
@@ -448,7 +497,6 @@ bool Puzzle::orderedSearch()
                 {
                     childPuzzle.moves++;
                     int childAccumulatedCost = currentNode.accumulatedCost + childPuzzle.cost(); // Atualiza o custo total acumulado com o custo do nó atual
-                    cout << childAccumulatedCost << endl;
                     openList.push({childPuzzle, childPuzzle.cost(), childAccumulatedCost});
                 }
             }
