@@ -26,8 +26,8 @@ private:
     // stack<vector<vector<int>>> openList;
     // set<vector<vector<int>>> visitedStates;
 
-    stack<string> openList;
-    set<string> closedList;
+    //stack<string> openList;
+    //set<string> closedList;
     int moves;
     pair<int, int> zeroPos = make_pair(0, 0);
     int dimension;
@@ -62,7 +62,8 @@ public:
     bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 
     vector<vector<int>>> parentMap, int &nodesExpanded, int depth,  set<vector<vector<int>>> &openList, set<vector<vector<int>>> &visitedStates); // backTracking
     bool breadthFirstSearch(); // busca em largura
-    bool depthLimitedSearch(int depthLimit); // busca em profundidade limitada
+    bool depthLimitedSearch(int depthLimit, set<vector<vector<int>>> &closedList,stack<vector<vector<int>>> &openList, int depth,
+    vector<vector<int>> currentState, map<vector<vector<int>>, vector<vector<int>>> &parentMap, int &nodesExpanded ); // busca em profundidade limitada
     bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
     bool orderedSearch(); // busca ordenada
     bool greedySearch(); // busca gulosa
