@@ -616,7 +616,6 @@ bool Puzzle::AstarSearch()
             vector<vector<int>> currentState = getStateFromString(initial);
             path.push_back(currentState);  
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            Imprime o caminho
             cout << "Path: " << endl;
             for (const auto& state : path) {
                 printState2(state);
