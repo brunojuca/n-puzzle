@@ -47,35 +47,35 @@ int main()
 //                 {9, 10, 11, 0}});
     //cout << sizeof(puzzle) << " bytes" << endl;
     // -------------------------------------------------- BackTracking --------------------------------------------- 
-    auto start = chrono::steady_clock::now();
-    puzzle.shuffle(1000000);
-    puzzle.printState();
-    int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
-    float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
-    float depthLimit = K * distance;
-    cout << depthLimit << endl;
-    if (!puzzle.backTracking(depthLimit)){
-        cout << "solution invalid." << endl;
-    }
-    auto end = chrono::steady_clock::now();
-    auto diff = end - start;
-    cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
-
-    // -------------------------------------------------- Busca em Largura ---------------------------------------------
+    // auto start = chrono::steady_clock::now();
     // puzzle.shuffle(1000000);
     // puzzle.printState();
-    // if(puzzle.checkParity()){
-    //     auto start2 = chrono::steady_clock::now();
-    //     if(!puzzle.breadthFirstSearch()){
-    //         cout << "solution invalid." << endl;
-    //     }
-    //     auto end2 = chrono::steady_clock::now();
-    //     auto diff2 = end2 - start2;
-    //     cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
-    //     //puzzle.printSet();
+    // int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
+    // float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
+    // float depthLimit = K * distance;
+    // cout << depthLimit << endl;
+    // if (!puzzle.backTracking(depthLimit)){
+    //     cout << "solution invalid." << endl;
     // }
-    // else
-    //     cout << "solution invalid. Parity unpaired." <<endl;
+    // auto end = chrono::steady_clock::now();
+    // auto diff = end - start;
+    // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+
+    // -------------------------------------------------- Busca em Largura ---------------------------------------------
+    puzzle.shuffle(1000000);
+    puzzle.printState();
+    if(puzzle.checkParity()){
+        auto start2 = chrono::steady_clock::now();
+        if(!puzzle.breadthFirstSearch()){
+            cout << "solution invalid." << endl;
+        }
+        auto end2 = chrono::steady_clock::now();
+        auto diff2 = end2 - start2;
+        cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
+        //puzzle.printSet();
+    }
+    else
+        cout << "solution invalid. Parity unpaired." <<endl;
     
     // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
     // puzzle.shuffle(1000000);

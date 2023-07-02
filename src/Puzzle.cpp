@@ -255,7 +255,7 @@ bool Puzzle::auxBackTracking(int depthLimit, vector<vector<int>> initial,
             this->state = parentMap[this->state]; // estado atual passa a ser o estado pai
         }
         path.push_back(initial);  
-        reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
+        reverse(path.begin(), path.end()); // Inverte ocaminho para obter a ordem correta
         // Imprime o caminho
         cout << "Path: " << endl;
         for (const auto& state : path) {
@@ -271,10 +271,10 @@ bool Puzzle::auxBackTracking(int depthLimit, vector<vector<int>> initial,
         vector<vector<int>> currentState = this->state;
         if(this->safelyMoveZero({movement.first, movement.second}))
         { 
-            if(visitedStates.find(this->state) == visitedStates.end()){
+            if(visitedStates.find(this->state) == visitedStates.end()){ // marca estado como visitado
                     visitedStates.insert(this->state);
             }
-            if (openList.find(this->state) == openList.end())  // Verifica se o estado já foi visitado
+            if (openList.find(this->state) == openList.end()) 
             {
                 parentMap[this->state] = currentState;
                 nodesExpanded++;
@@ -334,13 +334,16 @@ bool Puzzle::breadthFirstSearch()
             //cout << "Moves: "<< this->moves << endl;
             cout << "Nodes Expanded: " << nodesExpanded << endl;
             cout << "Visited States: " << visitedStates.size() << endl;
-            cout << "Depth: " << depth << endl;
+            
             // imprimir o caminho
             vector<vector<vector<int>>> path;
             while (currentPuzzle != initial) { // enquanto o estado atual não chega no estado inicial
+                depth++; // a profundidade é do estado inicial até o objetivo.
                 path.push_back(currentPuzzle); // adiciona o estado pai
                 currentPuzzle = parentMap[currentPuzzle]; // estado atual passa a ser o estado pai
             }
+            cout << "Depth: " << depth << endl;
+
             path.push_back(initial);  
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
             // Imprime o caminho

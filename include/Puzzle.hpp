@@ -4,7 +4,7 @@
 #include <vector>
 #include <stack>
 #include <unordered_set>
-#include <set>
+#include <set> // uma lista que impede valores duplicados
 #include <string>
 #include <cmath>
 #include <map>
