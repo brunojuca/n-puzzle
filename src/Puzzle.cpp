@@ -541,11 +541,11 @@ bool Puzzle::greedySearch()
             vector<vector<int>> currentState = getStateFromString(initial);
             path.push_back(currentState);  
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            cout << "Path: " << endl;
-            for (const auto& state : path) {
-                printState2(state);
-                cout << endl;
-            }
+            // cout << "Path: " << endl;
+            // for (const auto& state : path) {
+            //     printState2(state);
+            //     cout << endl;
+            // }
             return true;
         }
         closedList.insert(currentStateString);
@@ -616,11 +616,11 @@ bool Puzzle::AstarSearch()
             vector<vector<int>> currentState = getStateFromString(initial);
             path.push_back(currentState);  
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            cout << "Path: " << endl;
-            for (const auto& state : path) {
-                printState2(state);
-                cout << endl;
-            }
+            // cout << "Path: " << endl;
+            // for (const auto& state : path) {
+            //     printState2(state);
+            //     cout << endl;
+            // }
             return true;
         }
 
