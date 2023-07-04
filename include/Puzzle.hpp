@@ -34,9 +34,11 @@ private:
     int n;
     int m;
     void setZeroPosition();
-
-    
-
+    int depthMax;
+    int statesExpanded;
+    int visited;
+    float branchingFactor;
+    int accumulatedCost;
 public:
     Puzzle(vector<vector<int>> state, vector<vector<int>> goalState);
     ~Puzzle();
@@ -55,8 +57,11 @@ public:
     bool checkParity(); // checa paridade
     vector<vector<int>> getState(); // retorna o estado
     int cost(); // retorna a quantidade de peças fora do lugar - Custo
-    
-
+    int getDepth();
+    int getStateExpanded();
+    int getVisited();
+    float getBranchingFactor();
+    int getAccumulatedCost();
     // funções principais
     bool backTracking(int dephtLimit);
     bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 

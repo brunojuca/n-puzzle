@@ -108,17 +108,17 @@ int main()
     //     });
 
     //    5 x 5
-    Puzzle puzzle({{1, 2, 3, 4, 5},
-                   {6, 7, 8, 9, 10},
-                   {11, 12, 13, 14, 15},
-                   {16, 17, 18, 19, 20},
-                   {21, 22, 23, 24, 0}},
+    // Puzzle puzzle({{1, 2, 3, 4, 5},
+    //                {6, 7, 8, 9, 10},
+    //                {11, 12, 13, 14, 15},
+    //                {16, 17, 18, 19, 20},
+    //                {21, 22, 23, 24, 0}},
 
-                  {{1, 2, 3, 4, 5},
-                   {6, 7, 8, 9, 10},
-                   {11, 12, 13, 14, 15},
-                   {16, 17, 18, 19, 20},
-                   {21, 22, 23, 24, 0}});
+    //               {{1, 2, 3, 4, 5},
+    //                {6, 7, 8, 9, 10},
+    //                {11, 12, 13, 14, 15},
+    //                {16, 17, 18, 19, 20},
+    //                {21, 22, 23, 24, 0}});
     // Puzzle puzzle({{1, 2, 3, 4},
     //                {5, 6, 7, 8},
     //                {9, 10, 11, 12},
@@ -128,13 +128,13 @@ int main()
     //                {5, 6, 7, 8},
     //                {9, 10, 11, 12},
     //                {13, 14, 15, 0}});
-    //  Puzzle puzzle({{1, 2, 3},
-    //                 {4, 5, 6},
-    //                 {7, 8, 0}},
+     Puzzle puzzle({{1, 2, 3},
+                    {4, 5, 6},
+                    {7, 8, 0}},
 
-    //                 {{1, 2, 3},
-    //                 {4, 5, 6},
-    //                 {7, 8, 0}});
+                    {{1, 2, 3},
+                    {4, 5, 6},
+                    {7, 8, 0}});
     // Puzzle puzzle({{1, 2},
     //                 {3,0 }},
 
@@ -148,15 +148,12 @@ int main()
     //                 {5, 6, 7, 8},
     //                 {9, 10, 11, 0}});
     std::ofstream file("output.txt");
-    std::streambuf *original_stdout = std::cout.rdbuf(); // Salvar o buffer original do stdout
+    std::streambuf *original_stdout = std::cout.rdbuf();
 
-    // Redirecionar a saída para o arquivo
     std::cout.rdbuf(file.rdbuf());
-
-    // Seu código aqui que imprime no terminal
-
-    // Restaurar a saída padrão para o stdout
-
+    int numExecutions = 5;
+    for (int i = 0; i < numExecutions; i++)
+    {
     // -------------------------------------------------- BackTracking ---------------------------------------------
     // auto start = chrono::steady_clock::now();
     // puzzle.shuffle(1000000);
@@ -168,6 +165,11 @@ int main()
     // if (!puzzle.backTracking(depthLimit)){
     //     cout << "solution invalid." << endl;
     // }
+    // int statesExpanded = puzzle.getStateExpanded();
+    // int visitedStates = puzzle.getVisited();
+    // cout << "Estados expandidos: " << statesExpanded << endl;
+    // cout << "Estados visitados: " <<visitedStates << endl;
+    // cout << "Profundidade: " << puzzle.getDepth() << endl;
     // auto end = chrono::steady_clock::now();
     // auto diff = end - start;
     // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
@@ -180,13 +182,17 @@ int main()
     //     if(!puzzle.breadthFirstSearch()){
     //         cout << "solution invalid." << endl;
     //     }
+    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+    //     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() <<endl;
     //     auto end2 = chrono::steady_clock::now();
     //     auto diff2 = end2 - start2;
     //     cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
     //     //puzzle.printSet();
     // }
     // else
-    //     cout << "solution invalid. Parity unpaired." <<endl;
+    //     i--;
 
     // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
     // puzzle.shuffle(1000000);
@@ -196,12 +202,15 @@ int main()
     //     if(!puzzle.iterativeDepthSearch(40)){
     //         cout << "solution invalid." << endl;
     //     }
+    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
     //     auto end3 = chrono::steady_clock::now();
     //     auto diff3 = end3 - start3;
     //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
     // }
     // else{
-    //     cout << "solution invalid.Parity unpaired" << endl;
+    //     i--;
     // }
     // -------------------------------------------------- Busca Ordenada ---------------------------------------------
     // puzzle.shuffle(1000000);
@@ -212,12 +221,17 @@ int main()
     //     if(!puzzle.orderedSearch()){
     //         cout << "solution invalid." << endl;
     //     }
+    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+    //     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+    //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
     //     auto end3 = chrono::steady_clock::now();
     //     auto diff3 = end3 - start3;
     //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
     // }
     // else{
-    //     cout << "solution invalid.Parity unpaired" << endl;
+    //     i--;
     // }
     // -------------------------------------------------- Busca Gulosa ---------------------------------------------
     // puzzle.shuffle(1000000);
@@ -227,20 +241,24 @@ int main()
     //     if(!puzzle.greedySearch()){
     //         cout << "solution invalid." << endl;
     //     }
+    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+    //     //cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+    //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
     //     auto end = chrono::steady_clock::now();
     //     auto diff = end - start;
     //     cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
     // }
     // else{
-    //     cout << "solution invalid.Parity unpaired" << endl;
+    //     i--;
     // }
-    int numExecutions = 5;
-    for (int i = 0; i < numExecutions; i++)
-    {
+    
+    
         // -------------------------------------------------- Busca A* ---------------------------------------------
         // Resolve até 7x7 dependendo da sua quantidade de memória e da configuração do N-puzzle
         puzzle.shuffle(1000000);
-        //puzzle.printState();
+        puzzle.printState();
         if (puzzle.checkParity())
         {
             auto start = chrono::steady_clock::now();
@@ -248,6 +266,11 @@ int main()
             {
                 cout << "solution invalid." << endl;
             }
+            cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+            cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+            cout << "Profundidade: " << puzzle.getDepth() << endl;
+            cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+            cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
             auto end = chrono::steady_clock::now();
             auto diff = end - start;
             cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
@@ -257,7 +280,7 @@ int main()
         {
             i--;
         }
-    }
+    
     // -------------------------------------------------- Busca IDA* ---------------------------------------------
     //    puzzle.shuffle(1000000);
     //     puzzle.printState();
@@ -271,8 +294,9 @@ int main()
     //         cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
     //     }
     //     else{
-    //         cout << "solution invalid.Parity unpaired" << endl;
+    //         i--;
     //     }
+    }
     cout.rdbuf(original_stdout);
     file.close();
 }

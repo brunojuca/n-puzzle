@@ -213,11 +213,30 @@ int Puzzle::cost() // retorna a quantidade de peças fora do lugar
     return count;
 }
 
+int Puzzle::getDepth(){
+    return this->depthMax;
+}
+int Puzzle::getStateExpanded(){
+    return this->statesExpanded;
+}
+int Puzzle::getVisited()
+{
+    return this->visited;
+}
+float Puzzle::getBranchingFactor(){
+    return this->branchingFactor;
+}
+
+int Puzzle::getAccumulatedCost()
+{
+    return this->accumulatedCost;
+}
 bool Puzzle::backTracking(int depthLimit){
     vector<vector<int>> initial = this->state; // armazena o estado inicial;
     map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
     set<vector<vector<int>>> openList;
     set<vector<vector<int>>> visitedStates;
+    visitedStates.insert(this->state);
     int nodesExpanded = 0;
     parentMap[this->state] = {}; 
     int depth = 0;
@@ -233,9 +252,10 @@ bool Puzzle::auxBackTracking(int depthLimit, vector<vector<int>> initial,
     {
         cout << "Solution found:" << endl;
         this->printState();
-        cout << "Nodes Expanded: " << nodesExpanded << endl;
-        cout << "Visited States: " << visitedStates.size() << endl;
-        cout << "Depth: " << depth << endl;
+        this->statesExpanded = nodesExpanded;
+        this->visited = visitedStates.size();
+        this->depthMax = depth;
+        //cout << "Branching factor: " << (float)nodesExpanded/visitedStates.size() << endl;
         vector<vector<vector<int>>> path;
         while (this->state != initial) { // enquanto o estado atual não chega no estado inicial
             path.push_back(this->state); // adiciona o estado pai
@@ -288,7 +308,7 @@ bool Puzzle::breadthFirstSearch()
     map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
     int nodesExpanded = 0;
     int depth = 0;
-    int totalNodes = 0; // contabiliza a quantidade de nós pais
+    int totalParent = 0; // contabiliza a quantidade de nós pais
 
     parentMap[this->state] = {}; 
     while (!openList.empty()) // enquando a fila nõa está vazia
@@ -314,21 +334,20 @@ bool Puzzle::breadthFirstSearch()
                 safelyMoveZero({-movement.first, -movement.second}); // desfaz o movimento
             }
         }
-        totalNodes++;
+        totalParent++;
         if (currentPuzzle == this->goalState) // se estado atual é o objetivo
         {
             cout << "Solution found" << endl;
-            cout << "Expanded states: " << nodesExpanded << endl;
-            cout << "Visited States: " << visitedStates.size() << endl;
-            cout << "Fator de ramificacao: " << (float)nodesExpanded / (totalNodes ) << endl; // total de nós sucessores / total de nós pais
+            this->statesExpanded = nodesExpanded;
+            this->visited = visitedStates.size();
+            this->branchingFactor = (float)nodesExpanded / (totalParent ); // total de nós sucessores / total de nós pais
             vector<vector<vector<int>>> path;
             while (currentPuzzle != initial) { // enquanto o estado atual não chega no estado inicial
                 depth++; // a profundidade é do estado inicial até o objetivo.
                 path.push_back(currentPuzzle); // adiciona o estado pai
                 currentPuzzle = parentMap[currentPuzzle]; // estado atual passa a ser o estado pai
             }
-            cout << "Depth: " << depth << endl;
-
+            this->depthMax = depth;
             path.push_back(initial);  
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
             cout << "Path: " << endl;
@@ -378,24 +397,26 @@ bool Puzzle::iterativeDepthSearch(int maxDepth)
     vector<vector<int>> initial = this->state; // armazena o estado inicial;
     map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
     parentMap[this->state] = {}; 
-    int nodesExpanded = 0;
+    
     
     for (int depthLimit = 0; depthLimit <= maxDepth; depthLimit++)
     {
         int depth = 0;
+        int nodesExpanded = 0;
         closedList.clear();
         openList = stack<vector<vector<int>>>();
         
-        openList.push(this->state);
+        openList.push(initial);
         while (!openList.empty())
         {
             vector<vector<int>> currentState = openList.top();
             openList.pop();
 
             if (depthLimitedSearch(depthLimit, closedList, openList, depth, currentState, parentMap, nodesExpanded)){
-                cout << "Depth: " << depthLimit << endl;
-                cout << "Expanded states: " << nodesExpanded << endl;
-                cout << "Visited States: " << closedList.size() << endl; 
+                this->statesExpanded = nodesExpanded;
+                this->visited = closedList.size();
+                this->depthMax = depthLimit;
+                //this->branchingFactor = (float)nodesExpanded / (totalParent );
                 vector<vector<vector<int>>> path;
                 while (this->state != initial) { // enquanto o estado atual não chega no estado inicial
                     path.push_back(this->state ); // adiciona o estado pai
@@ -451,11 +472,11 @@ bool Puzzle::orderedSearch()
         if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
         {
             cout << "Solution found" << endl;
-            cout << "Depth: " << maxDepth <<endl;
-            cout << "Expanded states: " << nodesExpanded << endl;
-            cout << "Visited States: " << closedList.size() <<endl;
-            cout << "Cost: " << currentNode.accumulatedCost<<endl;
-            cout << "Fator de ramificacao: " << (float)nodesExpanded / totalNodes << endl;
+            this->statesExpanded = nodesExpanded;
+            this->visited = closedList.size();
+            this->depthMax = maxDepth;
+            this->accumulatedCost = currentNode.accumulatedCost;
+            this->branchingFactor = (float)nodesExpanded / totalNodes;
             vector<vector<vector<int>>> path;
             while (currentStateString != initial) { // enquanto o estado atual não chega no estado inicial
                 vector<vector<int>> currentState = getStateFromString(currentStateString);
@@ -527,11 +548,10 @@ bool Puzzle::greedySearch()
         string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
         if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
         {
-            cout << "Solution found" << endl;
-            cout << "Depth: " << maxDepth <<endl;
-            cout << "Expanded states: " << nodesExpanded << endl;
-            cout << "Visited States: " << closedList.size() <<endl;
-            cout << "Fator de ramificacao: " << (float)nodesExpanded / totalNodes << endl;
+            this->statesExpanded = nodesExpanded;
+            this->visited = closedList.size();
+            this->depthMax = maxDepth;
+            this->branchingFactor = (float)nodesExpanded / totalNodes;
             vector<vector<vector<int>>> path;
             while (currentStateString != initial) { // enquanto o estado atual não chega no estado inicial
                 vector<vector<int>> currentState = getStateFromString(currentStateString);
@@ -602,11 +622,11 @@ bool Puzzle::AstarSearch()
         if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
         {
             cout << "Solution found" << endl;
-            cout << "Depth: " << maxDepth <<endl;
-            cout << "Expanded states: " << nodesExpanded << endl;
-            cout << "Visited States: " << closedList.size() <<endl;
-            cout << "Cost: " << currentNode.cost<< endl;
-            cout << "Fator de ramificacao: " << (float)nodesExpanded / totalNodes << endl;
+            this->statesExpanded = nodesExpanded;
+            this->visited = closedList.size();
+            this->depthMax = maxDepth;
+            this->accumulatedCost = currentNode.cost;
+            this->branchingFactor = (float)nodesExpanded / totalNodes;
             vector<vector<vector<int>>> path;
             while (currentStateString != initial) { // enquanto o estado atual não chega no estado inicial
                 vector<vector<int>> currentState = getStateFromString(currentStateString);
@@ -689,11 +709,11 @@ bool Puzzle::IDAstarSearch()
             if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
             {
                 cout << "Solution found" << endl;
-                cout << "Depth: " << maxDepth <<endl;
-                cout << "Expanded states: " << nodesExpanded << endl;
-                cout << "Visited States: " << closedList.size() <<endl;
-                cout << "Cost: " << currentNode.cost<<endl;
-                cout << "Fator de ramificacao: " << (float)lastPatamarNodesExpanded / totalNodes << endl;
+                this->statesExpanded = nodesExpanded;
+                this->visited = closedList.size();
+                this->depthMax = maxDepth;
+                this->accumulatedCost = currentNode.cost;
+                this->branchingFactor = (float)nodesExpanded / totalNodes;
                 vector<vector<vector<int>>> path;
                 while (currentStateString != initial) { // enquanto o estado atual não chega no estado inicial
                     vector<vector<int>> currentState = getStateFromString(currentStateString);
