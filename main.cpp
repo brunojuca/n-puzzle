@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <fstream>
+#include <thread>
 using namespace std;
 
 int main()
@@ -128,13 +129,13 @@ int main()
     //                {5, 6, 7, 8},
     //                {9, 10, 11, 12},
     //                {13, 14, 15, 0}});
-     Puzzle puzzle({{1, 2, 3},
-                    {4, 5, 6},
-                    {7, 8, 0}},
+    Puzzle puzzle({{1, 2, 3},
+                   {4, 5, 6},
+                   {7, 8, 0}},
 
-                    {{1, 2, 3},
-                    {4, 5, 6},
-                    {7, 8, 0}});
+                  {{1, 2, 3},
+                   {4, 5, 6},
+                   {7, 8, 0}});
     // Puzzle puzzle({{1, 2},
     //                 {3,0 }},
 
@@ -151,152 +152,176 @@ int main()
     std::streambuf *original_stdout = std::cout.rdbuf();
 
     std::cout.rdbuf(file.rdbuf());
-    int numExecutions = 5;
+    int numExecutions = 1;
+    // puzzle.shuffle(1000000);
+    float totalStatesExpanded = 0;
+    float totalStatesVisited = 0;
+    float totalDepth = 0;
+    // float totalStatesExpanded = 0;
+    float totalCost = 0;
+    float totalHeuristc = 0;
+
     for (int i = 0; i < numExecutions; i++)
     {
-    // -------------------------------------------------- BackTracking ---------------------------------------------
-    // auto start = chrono::steady_clock::now();
-    // puzzle.shuffle(1000000);
-    // puzzle.printState();
-    // int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
-    // float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
-    // float depthLimit = K * distance;
-    // cout << depthLimit << endl;
-    // if (!puzzle.backTracking(depthLimit)){
-    //     cout << "solution invalid." << endl;
-    // }
-    // int statesExpanded = puzzle.getStateExpanded();
-    // int visitedStates = puzzle.getVisited();
-    // cout << "Estados expandidos: " << statesExpanded << endl;
-    // cout << "Estados visitados: " <<visitedStates << endl;
-    // cout << "Profundidade: " << puzzle.getDepth() << endl;
-    // auto end = chrono::steady_clock::now();
-    // auto diff = end - start;
-    // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+        // -------------------------------------------------- BackTracking ---------------------------------------------
+        // auto start = chrono::steady_clock::now();
+        // puzzle.shuffle(1000000);
+        // puzzle.printState();
+        // int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
+        // float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
+        // float depthLimit = K * distance;
+        // cout << depthLimit << endl;
+        // if (!puzzle.backTracking(depthLimit)){
+        //     cout << "solution invalid." << endl;
+        // }
+        // int statesExpanded = puzzle.getStateExpanded();
+        // int visitedStates = puzzle.getVisited();
+        // cout << "Estados expandidos: " << statesExpanded << endl;
+        // cout << "Estados visitados: " <<visitedStates << endl;
+        // cout << "Profundidade: " << puzzle.getDepth() << endl;
+        // auto end = chrono::steady_clock::now();
+        // auto diff = end - start;
+        // cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
 
-    // -------------------------------------------------- Busca em Largura ---------------------------------------------
-    // puzzle.shuffle(1000000);
-    // puzzle.printState();
-    // if(puzzle.checkParity()){
-    //     auto start2 = chrono::steady_clock::now();
-    //     if(!puzzle.breadthFirstSearch()){
-    //         cout << "solution invalid." << endl;
-    //     }
-    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
-    //     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() <<endl;
-    //     auto end2 = chrono::steady_clock::now();
-    //     auto diff2 = end2 - start2;
-    //     cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
-    //     //puzzle.printSet();
-    // }
-    // else
-    //     i--;
+        // -------------------------------------------------- Busca em Largura ---------------------------------------------
+        // puzzle.shuffle(1000000);
+        // puzzle.printState();
+        // if(puzzle.checkParity()){
+        //     auto start2 = chrono::steady_clock::now();
+        //     if(!puzzle.breadthFirstSearch()){
+        //         cout << "solution invalid." << endl;
+        //     }
+        //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+        //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+        //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+        //     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() <<endl;
+        //     auto end2 = chrono::steady_clock::now();
+        //     auto diff2 = end2 - start2;
+        //     cout << chrono::duration<double, milli>(diff2).count() << " ms" << endl;
+        //     //puzzle.printSet();
+        // }
+        // else
+        //     i--;
 
-    // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
-    // puzzle.shuffle(1000000);
-    // puzzle.printState();
-    // if(puzzle.checkParity()){
-    //     auto start3 = chrono::steady_clock::now();
-    //     if(!puzzle.iterativeDepthSearch(40)){
-    //         cout << "solution invalid." << endl;
-    //     }
-    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
-    //     auto end3 = chrono::steady_clock::now();
-    //     auto diff3 = end3 - start3;
-    //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
-    // }
-    // else{
-    //     i--;
-    // }
-    // -------------------------------------------------- Busca Ordenada ---------------------------------------------
-    // puzzle.shuffle(1000000);
-    // vector<vector<int>> state = puzzle.getState();
-    // puzzle.printState();
-    // if(puzzle.checkParity()){
-    //     auto start3 = chrono::steady_clock::now();
-    //     if(!puzzle.orderedSearch()){
-    //         cout << "solution invalid." << endl;
-    //     }
-    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
-    //     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-    //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
-    //     auto end3 = chrono::steady_clock::now();
-    //     auto diff3 = end3 - start3;
-    //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
-    // }
-    // else{
-    //     i--;
-    // }
-    // -------------------------------------------------- Busca Gulosa ---------------------------------------------
-    // puzzle.shuffle(1000000);
-    // puzzle.printState();
-    // if(puzzle.checkParity()){
-    //     auto start = chrono::steady_clock::now();
-    //     if(!puzzle.greedySearch()){
-    //         cout << "solution invalid." << endl;
-    //     }
-    //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-    //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-    //     cout << "Profundidade: " << puzzle.getDepth() << endl;
-    //     //cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-    //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
-    //     auto end = chrono::steady_clock::now();
-    //     auto diff = end - start;
-    //     cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
-    // }
-    // else{
-    //     i--;
-    // }
-    
-    
+        // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
+        // puzzle.shuffle(1000000);
+        // puzzle.printState();
+        // if(puzzle.checkParity()){
+        //     auto start3 = chrono::steady_clock::now();
+        //     if(!puzzle.iterativeDepthSearch(40)){
+        //         cout << "solution invalid." << endl;
+        //     }
+        //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+        //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+        //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+        //     auto end3 = chrono::steady_clock::now();
+        //     auto diff3 = end3 - start3;
+        //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
+        // }
+        // else{
+        //     i--;
+        // }
+        // -------------------------------------------------- Busca Ordenada ---------------------------------------------
+        // puzzle.shuffle(1000000);
+        // vector<vector<int>> state = puzzle.getState();
+        // puzzle.printState();
+        // if(puzzle.checkParity()){
+        //     auto start3 = chrono::steady_clock::now();
+        //     if(!puzzle.orderedSearch()){
+        //         cout << "solution invalid." << endl;
+        //     }
+        //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+        //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
+        //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+        //     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+        //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
+        //     auto end3 = chrono::steady_clock::now();
+        //     auto diff3 = end3 - start3;
+        //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
+        // }
+        // else{
+        //     i--;
+        // }
+        // -------------------------------------------------- Busca Gulosa ---------------------------------------------
+        //this_thread::sleep_for(std::chrono::seconds(1));
+        //     puzzle.shuffle(1000000);
+        //    // puzzle.printState();
+        //     if (puzzle.checkParity())
+        //     {
+        //         auto start = chrono::steady_clock::now();
+        //         if (!puzzle.greedySearch())
+        //         {
+        //             cout << "solution invalid." << endl;
+        //         }
+        //         totalStatesExpanded += puzzle.getStateExpanded();
+        //         totalStatesVisited += puzzle.getVisited();
+        //     //    cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+        //     //     cout << "Estados visitados: " << puzzle.getVisited() << endl;
+        //       //  cout << "Profundidade: " << puzzle.getDepth() << endl;
+        //         // cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+        //        // cout << "Fator: " << puzzle.getBranchingFactor() << endl;
+        //         auto end = chrono::steady_clock::now();
+        //         auto diff = end - start;
+        //         cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+        //     }
+        //     else
+        //     {
+        //         i--;
+        //     }
+
         // -------------------------------------------------- Busca A* ---------------------------------------------
         // Resolve até 7x7 dependendo da sua quantidade de memória e da configuração do N-puzzle
+        // puzzle.shuffle(1000000);
+        // puzzle.printState();
+        // if (puzzle.checkParity())
+        // {
+        //     auto start = chrono::steady_clock::now();
+        //     if (!puzzle.AstarSearch())
+        //     {
+        //         cout << "solution invalid." << endl;
+        //     }
+        //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
+        //     cout << "Estados visitados: " << puzzle.getVisited() << endl;
+        //     cout << "Profundidade: " << puzzle.getDepth() << endl;
+        //     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+        //     cout << "Fator: " << puzzle.getBranchingFactor() << endl;
+        //     auto end = chrono::steady_clock::now();
+        //     auto diff = end - start;
+        //     cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+        //     cout << endl;
+        // }
+        // else
+        // {
+        //     i--;
+        // }
+
+        // -------------------------------------------------- Busca IDA* ---------------------------------------------
         puzzle.shuffle(1000000);
         puzzle.printState();
         if (puzzle.checkParity())
         {
             auto start = chrono::steady_clock::now();
-            if (!puzzle.AstarSearch())
+            if (!puzzle.IDAstarSearch())
             {
                 cout << "solution invalid." << endl;
             }
             cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-            cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-            cout << "Profundidade: " << puzzle.getDepth() << endl;
+            cout << "Estados visitados: " << puzzle.getVisited() << endl;
+            cout << "Profundidade: " << puzzle.getDepth() << endl; // Concertar profundidade
             cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-            cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
+            cout << "Fator: " << puzzle.getBranchingFactor() << endl; // concertar fator
+            cout << endl;
             auto end = chrono::steady_clock::now();
             auto diff = end - start;
             cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
-            cout << endl;
         }
         else
         {
             i--;
         }
-    
-    // -------------------------------------------------- Busca IDA* ---------------------------------------------
-    //    puzzle.shuffle(1000000);
-    //     puzzle.printState();
-    //     if(puzzle.checkParity()){
-    //         auto start = chrono::steady_clock::now();
-    //         if(!puzzle.IDAstarSearch()){
-    //             cout << "solution invalid." << endl;
-    //         }
-    //         auto end = chrono::steady_clock::now();
-    //         auto diff = end - start;
-    //         cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
-    //     }
-    //     else{
-    //         i--;
-    //     }
     }
+    //cout << "Estados expandidos: " << (int)totalStatesExpanded / numExecutions << endl;
+    //cout << "Estados visitados: " << (int)totalStatesVisited / numExecutions << endl;
     cout.rdbuf(original_stdout);
     file.close();
 }

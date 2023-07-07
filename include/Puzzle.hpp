@@ -62,6 +62,7 @@ public:
     int getVisited();
     float getBranchingFactor();
     int getAccumulatedCost();
+    
     // funções principais
     bool backTracking(int dephtLimit);
     bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 
