@@ -724,9 +724,7 @@ bool Puzzle::IDAstarSearch()
     };
     vector<vector<int>> initial = this->state;
     Puzzle initial2 = *this;
-    int nodesExpanded = 0;
 
-    int maxDepth = 0;
     int patamar = manhattanDistance(); // Limite inicial é a heurística do estado inicial
     while (true)
     {
@@ -740,7 +738,8 @@ bool Puzzle::IDAstarSearch()
         *this = initial2;
         string current = convertStateToString(this->state);
         parentMap[current] = {};
-        int totalNodes = 0;
+        int totalNodes = 1;
+        int nodesExpanded = 0;
         int lastPatamarNodesExpanded = 0;
         openList.push({*this, manhattanDistance(), cost(), 0});
         while (!openList.empty())
@@ -754,14 +753,15 @@ bool Puzzle::IDAstarSearch()
             {
                 this->statesExpanded = nodesExpanded;
                 this->visited = closedList.size();
-                this->depthMax = maxDepth;
+                this->depthMax = currentNode.depth;
                 this->accumulatedCost = currentNode.cost + currentNode.heuristic;
-                //this->branchingFactor = (float)nodesExpanded / totalNodes;
+                this->branchingFactor = (float)nodesExpanded / (totalNodes - 1);
+                cout << totalNodes << endl;
                 vector<vector<vector<int>>> path;
                 string currentStateString = convertStateToString(currentState);
                 string initialState = convertStateToString(initial);
-                while (currentStateString != initialState)// enquanto o estado atual não chega no estado inicial
-                { 
+                while (currentStateString != initialState) // enquanto o estado atual não chega no estado inicial
+                {
                     vector<vector<int>> currentState2 = getStateFromString(currentStateString);
                     path.push_back(currentState2);                      // adiciona o estado pai
                     currentStateString = parentMap[currentStateString]; // estado atual passa a ser o estado pai
@@ -797,7 +797,6 @@ bool Puzzle::IDAstarSearch()
                         nodesExpanded++;
                         lastPatamarNodesExpanded++;
                         int childDepth = currentNode.depth + 1;
-                        maxDepth = max(maxDepth, childDepth);
                         int childAccumulatedCost = currentNode.cost + this->cost();
                         openList.push({*this, this->manhattanDistance(), childAccumulatedCost, childDepth});
                         parentMap[childStateString] = currentStateString;
@@ -809,7 +808,7 @@ bool Puzzle::IDAstarSearch()
         }
 
         if (nextPatamar == INT_MAX)
-            return false; // Nenhum caminho encontrado até o próximo limite
+            return false;      // Nenhum caminho encontrado até o próximo limite
         patamar = nextPatamar; // Atualiza o limite para o próximo limite calculado
     }
 

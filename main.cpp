@@ -152,17 +152,17 @@ int main()
     std::streambuf *original_stdout = std::cout.rdbuf();
 
     std::cout.rdbuf(file.rdbuf());
-    int numExecutions = 1;
+    int numExecutions = 10;
     // puzzle.shuffle(1000000);
     float totalStatesExpanded = 0;
     float totalStatesVisited = 0;
     float totalDepth = 0;
-    // float totalStatesExpanded = 0;
     float totalCost = 0;
     float totalHeuristc = 0;
 
     for (int i = 0; i < numExecutions; i++)
     {
+        this_thread::sleep_for(std::chrono::seconds(1)); // Para não gerar os mesmos estados
         // -------------------------------------------------- BackTracking ---------------------------------------------
         // auto start = chrono::steady_clock::now();
         // puzzle.shuffle(1000000);
@@ -243,7 +243,7 @@ int main()
         //     i--;
         // }
         // -------------------------------------------------- Busca Gulosa ---------------------------------------------
-        //this_thread::sleep_for(std::chrono::seconds(1));
+        
         //     puzzle.shuffle(1000000);
         //    // puzzle.printState();
         //     if (puzzle.checkParity())
