@@ -62,16 +62,18 @@ public:
     int getVisited();
     float getBranchingFactor();
     int getAccumulatedCost();
-    
+    float calculateBranchingFactor(const map<vector<vector<int>>, vector<vector<int>>>& parentMap);
+
     // funções principais
     bool backTracking(int dephtLimit);
     bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 
     vector<vector<int>>> parentMap, int &nodesExpanded, int depth,  set<vector<vector<int>>> &openList,
      set<vector<vector<int>>> &visitedStates); // backTracking
     bool breadthFirstSearch(); // busca em largura
-    bool depthLimitedSearch(int depthLimit, set<vector<vector<int>>> &closedList,stack<vector<vector<int>>> &openList, int depth,
-    vector<vector<int>> currentState, map<vector<vector<int>>, vector<vector<int>>> &parentMap, int &nodesExpanded ); // busca em profundidade limitada
-    bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
+    bool depthLimitedSearch(int depthLimit, set<vector<vector<int>>> &closedList,stack<vector<vector<int>>> &openList, int &depth,
+   vector<vector<int>> currentState, map<vector<vector<int>>, vector<vector<int>>> &parentMap ); // busca em profundidade limitada
+   bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
+    //bool depthLimitedSearch(int depthLimit);
     bool orderedSearch(); // busca ordenada
     bool greedySearch(); // busca gulosa
     bool AstarSearch(); // Busca A*
