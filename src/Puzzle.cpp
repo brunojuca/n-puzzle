@@ -463,95 +463,11 @@ bool Puzzle::depthLimitedSearch(int depthLimit)
     }
     return false;
 }
-// bool Puzzle::depthLimitedSearch(int depthLimit, set<vector<vector<int>>> &closedList, stack<vector<vector<int>>> &openList, int &depth,
-//                                 vector<vector<int>> currentState, map<vector<vector<int>>, vector<vector<int>>> &parentMap)
-// {
-//     closedList.insert(this->state);
-//     if (this->state == this->goalState)
-//         return true;
-
-//     if (depth == depthLimit)
-//         return false;
-
-//     vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
-
-//     for (pair<int, int> movement : movements)
-//     {
-//         if (safelyMoveZero({movement.first, movement.second}))
-//         {
-//             if (closedList.find(this->state) == closedList.end())
-//             {
-//                 openList.push(this->state);
-//                 parentMap[this->state] = currentState;
-//             }
-//             safelyMoveZero({-movement.first, -movement.second});
-//         }
-//     }
-//     depth++;
-//    // cout << depth << endl;
-//     this->state = openList.top();
-//    // setZeroPosition();
-//     if (depthLimitedSearch(depthLimit, closedList, openList, depth, this->state, parentMap))
-//         return true;
-//     return false;
-// }
-
-// bool Puzzle::iterativeDepthSearch(int maxDepth)
-// {
-//     set<vector<vector<int>>> closedList;
-//     stack<vector<vector<int>>> openList;
-//     vector<vector<int>> initial = this->state;               // armazena o estado inicial;
-//     map<vector<vector<int>>, vector<vector<int>>> parentMap; // armazena o nó pai
-
-//     for (int depthLimit = 0; depthLimit <= maxDepth; depthLimit++)
-//     {
-//         cout << depthLimit << endl;
-//         int depth = 0;
-//         int nodesExpanded = 0;
-//         closedList.clear();
-//         openList = stack<vector<vector<int>>>();
-//         parentMap[this->state] = {};
-//         openList.push(initial);
-//         while (!openList.empty())
-//         {
-//             this->state = openList.top();
-//             setZeroPosition();
-//             openList.pop();
-
-//             if (depthLimitedSearch(depthLimit, closedList, openList, depth, this->state, parentMap))
-//             {
-//                 // this->statesExpanded = ;
-//                 this->visited = closedList.size();
-//                 this->depthMax = depthLimit;
-//                 this->branchingFactor = calculateBranchingFactor(parentMap);
-//                 vector<vector<vector<int>>> path;
-//                 while (this->state != initial)
-//                 {                                         // enquanto o estado atual não chega no estado inicial
-//                     path.push_back(this->state);          // adiciona o estado pai
-//                     this->state = parentMap[this->state]; // estado atual passa a ser o estado pai
-//                 }
-
-//                 path.push_back(initial);
-//                 reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-//                 // Imprime o caminho
-//                 // cout << "Path: " << endl;
-//                 // for (const auto &state : path)
-//                 // {
-//                 //     printState2(state);
-//                 //     cout << endl;
-//                 // }
-//                 return true;
-//                 break;
-//             }
-//         }
-//     }
-//     return false;
-// }
 bool Puzzle::orderedSearch()
 {
     struct PuzzleNode
     {
-        Puzzle puzzle;       // o motivo de armazenar a classe é para tornar a implementação menos complexa, já que as funções pertence a classe e não à matriz.
+        vector<vector<int>> puzzle;       // o motivo de armazenar a classe é para tornar a implementação menos complexa, já que as funções pertence a classe e não à matriz.
         int cost;            // custo do estado
         int accumulatedCost; // Custo total acumulado até o nó atual
         int depth;           // Profundidade do nó atual
@@ -562,40 +478,52 @@ bool Puzzle::orderedSearch()
     };
 
     priority_queue<PuzzleNode> openList;
-    unordered_set<string> closedList; // unordered_set utiliza tabela hash, então é necessário passar uma função hash, porém, para string, o próprio c++
-                                      // fornece essa função hash. Por esse motivo foi utilizado string ao invés de matriz.
-    string initial = convertStateToString(this->state);
-    map<string, string> parentMap; // armazena o nó pai
-    string current = convertStateToString(this->state);
-    parentMap[current] = {};
+    set<vector<vector<int>>> closedList;
+    vector<vector<int>> initial = this->state;
+    map<vector<vector<int>>, vector<vector<int>>> parentMap; 
+    parentMap[this->state] = {};
     int nodesExpanded = 0;
-    openList.push({*this, cost(), 0, 0}); // O custo total acumulado inicial é 0
-    int maxDepth = 0;
-    int totalNodes = 0;
+    openList.push({this->state, cost(), cost(), 0});
     while (!openList.empty())
     {
-        PuzzleNode currentNode = openList.top();
+       
+        PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
         openList.pop();
-        Puzzle currentPuzzle = currentNode.puzzle;
-        string currentStateString = currentPuzzle.convertStateToString(currentPuzzle.getState());
-
-        if (currentStateString == currentPuzzle.convertStateToString(currentPuzzle.goalState))
+        this->state = currentNode.puzzle;
+        setZeroPosition();
+        vector<vector<int>> currentState = currentNode.puzzle;
+       
+        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
+        for (pair<int, int> movement : movements)
         {
-            cout << "Solution found" << endl;
+            if (safelyMoveZero({movement.first, movement.second}))
+            {
+                if (closedList.find(this->state) == closedList.end())
+                {
+                    nodesExpanded++;
+                    int childDepth = currentNode.depth + 1;
+                    int childAccumulatedCost = currentNode.accumulatedCost + cost();
+                    openList.push({this->state, cost() ,childAccumulatedCost, childDepth});
+                    parentMap[this->state] = currentState;
+                }
+                safelyMoveZero({-movement.first, -movement.second});
+            }
+        }
+        closedList.insert(currentState);
+        if (currentState == this->goalState)
+        {
             this->statesExpanded = nodesExpanded;
             this->visited = closedList.size();
-            this->depthMax = maxDepth;
+            this->depthMax = currentNode.depth;
             this->accumulatedCost = currentNode.accumulatedCost;
-            this->branchingFactor = (float)nodesExpanded / totalNodes;
+            this->branchingFactor = calculateBranchingFactor(parentMap);
             vector<vector<vector<int>>> path;
-            while (currentStateString != initial)
-            { // enquanto o estado atual não chega no estado inicial
-                vector<vector<int>> currentState = getStateFromString(currentStateString);
-                path.push_back(currentState);                       // adiciona o estado pai
-                currentStateString = parentMap[currentStateString]; // estado atual passa a ser o estado pai
+            while (currentState != initial)
+            { 
+                path.push_back(currentState);           // adiciona o estado pai
+                currentState = parentMap[currentState]; // estado atual passa a ser o estado pai
             }
-            vector<vector<int>> currentState = getStateFromString(initial);
-            path.push_back(currentState);
+            path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
             cout << "Path: " << endl;
             for (const auto &state : path)
@@ -605,36 +533,15 @@ bool Puzzle::orderedSearch()
             }
             return true;
         }
-        closedList.insert(currentStateString);
 
-        vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
-        for (pair<int, int> movement : movements)
-        {
-            Puzzle childPuzzle = currentPuzzle;
-            if (childPuzzle.safelyMoveZero({movement.first, movement.second}))
-            {
-                string childStateString = childPuzzle.convertStateToString(childPuzzle.getState());
-                if (closedList.find(childStateString) == closedList.end())
-                {
-                    nodesExpanded++;
-                    int childAccumulatedCost = currentNode.accumulatedCost + childPuzzle.cost(); // Atualiza o custo total acumulado com o custo do nó atual
-                    int childDepth = currentNode.depth + 1;
-                    maxDepth = max(maxDepth, childDepth);
-                    openList.push({childPuzzle, childPuzzle.cost(), childAccumulatedCost, childDepth});
-                    parentMap[childStateString] = currentStateString;
-                }
-            }
-        }
-        totalNodes++;
     }
-
     return false;
 }
 bool Puzzle::greedySearch()
 {
     struct PuzzleNode
     {
-        Puzzle puzzle;
+        vector<vector<int>> puzzle;
         int heuristic;
         int depth; // Profundidade do nó atual
         bool operator<(const PuzzleNode &other) const
@@ -646,33 +553,28 @@ bool Puzzle::greedySearch()
     priority_queue<PuzzleNode> openList;
     set<vector<vector<int>>> closedList;
     vector<vector<int>> initial = this->state;
-    map<string, string> parentMap; // armazena o nó pai - armazenando a matriz estava dando erro, por isso optei pela string
-    string current = convertStateToString(this->state);
-    parentMap[current] = {};
+    map<vector<vector<int>>, vector<vector<int>>> parentMap; 
+    parentMap[this->state] = {};
     int nodesExpanded = 0;
-    openList.push({*this, manhattanDistance(), 0});
-    int maxDepth = 0;
-    int totalNodes = 0;
+    openList.push({this->state, manhattanDistance(), 0});
     while (!openList.empty())
     {
         PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
         openList.pop();
-        *this = currentNode.puzzle;
-        vector<vector<int>> currentState = currentNode.puzzle.state;
+        this->state = currentNode.puzzle;
+        setZeroPosition();
+        vector<vector<int>> currentState = currentNode.puzzle;
         if (currentState == this->goalState)
         {
             this->statesExpanded = nodesExpanded;
             this->visited = closedList.size();
-            this->depthMax = maxDepth;
-            this->branchingFactor = (float)nodesExpanded / totalNodes;
+            this->depthMax = currentNode.depth;
+            this->branchingFactor = calculateBranchingFactor(parentMap);
             vector<vector<vector<int>>> path;
-            string currentStateString = convertStateToString(currentState);
-            string initialState = convertStateToString(initial);
-            while (currentStateString != initialState)
-            { // enquanto o estado atual não chega no estado inicial
-                vector<vector<int>> currentState2 = getStateFromString(currentStateString);
-                path.push_back(currentState2);                      // adiciona o estado pai
-                currentStateString = parentMap[currentStateString]; // estado atual passa a ser o estado pai
+            while (currentState != initial)
+            { 
+                path.push_back(currentState);                      // adiciona o estado pai
+                currentState = parentMap[currentState]; // estado atual passa a ser o estado pai
             }
             path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
@@ -684,26 +586,23 @@ bool Puzzle::greedySearch()
             }
             return true;
         }
-        string currentStateString = convertStateToString(this->state);
-        closedList.insert(currentState);
         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
         for (pair<int, int> movement : movements)
         {
             if (safelyMoveZero({movement.first, movement.second}))
             {
-                string childStateString = convertStateToString(this->state);
                 if (closedList.find(this->state) == closedList.end())
                 {
                     nodesExpanded++;
                     int childDepth = currentNode.depth + 1;
-                    maxDepth = max(maxDepth, childDepth);
-                    openList.push({*this, this->manhattanDistance(), childDepth});
-                    parentMap[childStateString] = currentStateString;
+                    openList.push({this->state, this->manhattanDistance(), childDepth});
+                    parentMap[this->state] = currentState;
                 }
                 safelyMoveZero({-movement.first, -movement.second});
             }
         }
-        totalNodes++;
+        closedList.insert(currentState);
+        
     }
     return false;
 }
@@ -711,9 +610,9 @@ bool Puzzle::AstarSearch()
 {
     struct PuzzleNode
     {
-        Puzzle puzzle;
+        vector<vector<int>> puzzle;
         int heuristic;
-        int cost;
+        int cost; // custo acumulado
         int depth; // Profundidade do nó atual
         bool operator<(const PuzzleNode &other) const
         {
@@ -724,67 +623,58 @@ bool Puzzle::AstarSearch()
     priority_queue<PuzzleNode> openList;
     set<vector<vector<int>>> closedList;
     vector<vector<int>> initial = this->state;
-    // string initial = convertStateToString(this->state);
-    map<string, string> parentMap; // armazena o nó pai
-    string current = convertStateToString(this->state);
-    parentMap[current] = {};
+    map<vector<vector<int>>, vector<vector<int>>> parentMap; 
+    parentMap[this->state] = {};
     int nodesExpanded = 0;
-    openList.push({*this, manhattanDistance(), cost(), 0});
-    int maxDepth = 0;
-    int totalNodes = 0;
+    openList.push({this->state, manhattanDistance(), cost(), 0});
     while (!openList.empty())
     {
         PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
         openList.pop();
-        *this = currentNode.puzzle;
-        vector<vector<int>> currentState = currentNode.puzzle.state;
+        this->state = currentNode.puzzle;
+        setZeroPosition();
+        vector<vector<int>> currentState = currentNode.puzzle;
         if (currentState == this->goalState)
         {
             this->statesExpanded = nodesExpanded;
             this->visited = closedList.size();
-            this->depthMax = maxDepth;
+            this->depthMax = currentNode.depth;
             this->accumulatedCost = currentNode.cost + currentNode.heuristic;
-            this->branchingFactor = (float)nodesExpanded / totalNodes;
+            this->branchingFactor = calculateBranchingFactor(parentMap);
             vector<vector<vector<int>>> path;
-            string currentStateString = convertStateToString(currentState);
-            string initialState = convertStateToString(initial);
-            while (currentStateString != initialState)
-            { // enquanto o estado atual não chega no estado inicial
-                vector<vector<int>> currentState2 = getStateFromString(currentStateString);
-                path.push_back(currentState2);                      // adiciona o estado pai
-                currentStateString = parentMap[currentStateString]; // estado atual passa a ser o estado pai
+            while (currentState != initial)
+            { 
+                path.push_back(currentState);           // adiciona o estado pai
+                currentState = parentMap[currentState]; // estado atual passa a ser o estado pai
             }
             path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            // cout << "Path: " << endl;
-            // for (const auto &state : path)
-            // {
-            //     printState2(state);
-            //     cout << endl;
-            // }
+            cout << "Path: " << endl;
+            for (const auto &state : path)
+            {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
-        string currentStateString = convertStateToString(this->state);
-        closedList.insert(currentState);
         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
         for (pair<int, int> movement : movements)
         {
             if (safelyMoveZero({movement.first, movement.second}))
             {
-                string childStateString = convertStateToString(this->state);
                 if (closedList.find(this->state) == closedList.end())
                 {
                     nodesExpanded++;
                     int childDepth = currentNode.depth + 1;
-                    maxDepth = max(maxDepth, childDepth);
                     int childAccumulatedCost = currentNode.cost + this->cost();
-                    openList.push({*this, this->manhattanDistance(), childAccumulatedCost, childDepth});
-                    parentMap[childStateString] = currentStateString;
+                    openList.push({this->state, this->manhattanDistance(), childAccumulatedCost, childDepth});
+                    parentMap[this->state] = currentState;
                 }
                 safelyMoveZero({-movement.first, -movement.second});
             }
         }
-        totalNodes++;
+        closedList.insert(currentState);
+
     }
     return false;
 }
@@ -793,7 +683,7 @@ bool Puzzle::IDAstarSearch()
 {
     struct PuzzleNode
     {
-        Puzzle puzzle;
+        vector<vector<int>> puzzle;
         int heuristic;
         int cost;
         int depth;
@@ -803,8 +693,6 @@ bool Puzzle::IDAstarSearch()
         }
     };
     vector<vector<int>> initial = this->state;
-    Puzzle initial2 = *this;
-
     int patamar = manhattanDistance(); // Limite inicial é a heurística do estado inicial
     while (true)
     {
@@ -812,22 +700,20 @@ bool Puzzle::IDAstarSearch()
 
         priority_queue<PuzzleNode> openList;
         set<vector<vector<int>>> closedList;
-
-        map<string, string> parentMap; // armazena o nó pai
+        map<vector<vector<int>>, vector<vector<int>>> parentMap; 
         this->state = initial;
-        *this = initial2;
-        string current = convertStateToString(this->state);
-        parentMap[current] = {};
-        int totalNodes = 1;
+        setZeroPosition();
+        parentMap[this->state] = {};
         int nodesExpanded = 0;
         int lastPatamarNodesExpanded = 0;
-        openList.push({*this, manhattanDistance(), cost(), 0});
+        openList.push({this->state, manhattanDistance(), cost(), 0});
         while (!openList.empty())
         {
             PuzzleNode currentNode = openList.top();
             openList.pop();
-            *this = currentNode.puzzle;
-            vector<vector<int>> currentState = currentNode.puzzle.state;
+            this->state = currentNode.puzzle;
+            setZeroPosition();
+            vector<vector<int>> currentState = currentNode.puzzle;
 
             if (currentState == this->goalState)
             {
@@ -835,15 +721,12 @@ bool Puzzle::IDAstarSearch()
                 this->visited = closedList.size();
                 this->depthMax = currentNode.depth;
                 this->accumulatedCost = currentNode.cost + currentNode.heuristic;
-                this->branchingFactor = (float)nodesExpanded / (totalNodes - 1);
+                this->branchingFactor = calculateBranchingFactor(parentMap);
                 vector<vector<vector<int>>> path;
-                string currentStateString = convertStateToString(currentState);
-                string initialState = convertStateToString(initial);
-                while (currentStateString != initialState) // enquanto o estado atual não chega no estado inicial
+                while (currentState != initial) // enquanto o estado atual não chega no estado inicial
                 {
-                    vector<vector<int>> currentState2 = getStateFromString(currentStateString);
-                    path.push_back(currentState2);                      // adiciona o estado pai
-                    currentStateString = parentMap[currentStateString]; // estado atual passa a ser o estado pai
+                    path.push_back(currentState);                      // adiciona o estado pai
+                    currentState = parentMap[currentState]; // estado atual passa a ser o estado pai
                 }
                 path.push_back(initial);
                 reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
@@ -860,30 +743,26 @@ bool Puzzle::IDAstarSearch()
             {
                 // Atualiza o próximo limite com o menor custo do caminho que excede o limite atual
                 nextPatamar = min(nextPatamar, currentNode.heuristic + currentNode.cost);
-                continue;
+                break;
             }
-
-            string currentStateString = convertStateToString(this->state);
-            closedList.insert(currentState);
             vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
             for (pair<int, int> movement : movements)
             {
                 if (safelyMoveZero({movement.first, movement.second}))
                 {
-                    string childStateString = convertStateToString(this->state);
                     if (closedList.find(this->state) == closedList.end())
                     {
                         nodesExpanded++;
                         lastPatamarNodesExpanded++;
                         int childDepth = currentNode.depth + 1;
                         int childAccumulatedCost = currentNode.cost + this->cost();
-                        openList.push({*this, this->manhattanDistance(), childAccumulatedCost, childDepth});
-                        parentMap[childStateString] = currentStateString;
+                        openList.push({this->state, this->manhattanDistance(), childAccumulatedCost, childDepth});
+                        parentMap[this->state] = currentState;
                     }
                     safelyMoveZero({-movement.first, -movement.second});
                 }
             }
-            totalNodes++;
+            closedList.insert(currentState);
         }
 
         if (nextPatamar == INT_MAX)

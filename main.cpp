@@ -3,6 +3,7 @@
 #include <chrono>
 #include <fstream>
 #include <thread>
+#include <cmath>
 using namespace std;
 
 int main()
@@ -152,13 +153,13 @@ int main()
     std::streambuf *original_stdout = std::cout.rdbuf();
 
     std::cout.rdbuf(file.rdbuf());
-    int numExecutions = 1;
+    int numExecutions = 10;
     // puzzle.shuffle(1000000);
     int totalStatesExpanded = 0;
     int totalStatesVisited = 0;
     int totalDepth = 0;
     int totalCost = 0;
-    int totalFactor = 0;
+    float totalFactor = 0;
     int totalHeuristc = 0;
     float totalTime = 0;
     for (int i = 0; i < numExecutions; i++)
@@ -235,21 +236,22 @@ int main()
         //     i--;
         // -------------------------------------------------- Busca Ordenada ---------------------------------------------
         // puzzle.shuffle(1000000);
-        // vector<vector<int>> state = puzzle.getState();
-        // puzzle.printState();
         // if(puzzle.checkParity()){
-        //     auto start3 = chrono::steady_clock::now();
+        //     auto start = chrono::steady_clock::now();
         //     if(!puzzle.orderedSearch()){
         //         cout << "solution invalid." << endl;
+        //         i--;
         //     }
-        //     cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-        //     cout << "Estados visitados: " <<puzzle.getVisited() << endl;
-        //     cout << "Profundidade: " << puzzle.getDepth() << endl;
-        //     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-        //     cout << "Fator: " << puzzle.getBranchingFactor()<< endl;
-        //     auto end3 = chrono::steady_clock::now();
-        //     auto diff3 = end3 - start3;
-        //     cout << chrono::duration<double, milli>(diff3).count() << " ms" << endl;
+        //     else{
+        //         totalStatesExpanded+= puzzle.getStateExpanded();
+        //         totalStatesVisited += puzzle.getVisited(); 
+        //         totalDepth += puzzle.getDepth();
+        //         totalCost += puzzle.getAccumulatedCost();
+        //         totalFactor += puzzle.getBranchingFactor();
+        //         auto end = chrono::steady_clock::now();
+        //         auto diff = end - start;
+        //         totalTime += chrono::duration<double, milli>(diff).count();
+        //     }
         // }
         // else{
         //     i--;
@@ -264,17 +266,18 @@ int main()
         //         if (!puzzle.greedySearch())
         //         {
         //             cout << "solution invalid." << endl;
+        //             i--;
         //         }
-        //         totalStatesExpanded += puzzle.getStateExpanded();
-        //         totalStatesVisited += puzzle.getVisited();
-        //     //    cout << "Estados expandidos: " << puzzle.getStateExpanded() << endl;
-        //     //     cout << "Estados visitados: " << puzzle.getVisited() << endl;
-        //       //  cout << "Profundidade: " << puzzle.getDepth() << endl;
-        //         // cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-        //        // cout << "Fator: " << puzzle.getBranchingFactor() << endl;
-        //         auto end = chrono::steady_clock::now();
-        //         auto diff = end - start;
-        //         cout << chrono::duration<double, milli>(diff).count() << " ms" << endl;
+        //         else{
+        //             totalStatesExpanded+= puzzle.getStateExpanded();
+        //             totalStatesVisited += puzzle.getVisited(); 
+        //             totalDepth += puzzle.getDepth();
+        //             totalCost += puzzle.getAccumulatedCost();
+        //             totalFactor += puzzle.getBranchingFactor();
+        //             auto end = chrono::steady_clock::now();
+        //             auto diff = end - start;
+        //             totalTime += chrono::duration<double, milli>(diff).count();
+        //     }
         //     }
         //     else
         //     {
@@ -315,26 +318,28 @@ int main()
     //         if (!puzzle.IDAstarSearch())
     //         {
     //             cout << "solution invalid." << endl;
+    //             i--;
     //         }
-    //         totalStatesExpanded+= puzzle.getStateExpanded();
-    //         totalStatesVisited += puzzle.getVisited(); 
-    //         totalDepth += puzzle.getDepth();
-    //         totalCost += puzzle.getAccumulatedCost();
-    //         totalFactor += puzzle.getBranchingFactor();
-    //         auto end = chrono::steady_clock::now();
-    //         auto diff = end - start;
-    //         totalTime += chrono::duration<double, milli>(diff).count();
+    //         else{
+    //             totalStatesExpanded+= puzzle.getStateExpanded();
+    //             totalStatesVisited += puzzle.getVisited(); 
+    //             totalDepth += puzzle.getDepth();
+    //             totalCost += puzzle.getAccumulatedCost();
+    //             totalFactor += puzzle.getBranchingFactor();
+    //             auto end = chrono::steady_clock::now();
+    //             auto diff = end - start;
+    //             totalTime += chrono::duration<double, milli>(diff).count();
+    //         }
+
     //     }
     //     else
-    //     {
     //         i--;
-    //     }
     }
     cout << "Estados expandidos: " << totalStatesExpanded / numExecutions << endl;
     cout << "Estados visitados: " << totalStatesVisited / numExecutions << endl;
-    cout << "Profundidade média: " << totalDepth/ numExecutions << endl;
-    //cout << "Custo Médio: " << totalStatesVisited / numExecutions << endl;
-    cout << "Fator de ramificação: " << totalFactor / numExecutions << endl;
+    cout << "Profundidade média: " << round(totalDepth/ numExecutions) << endl;
+    cout << "Custo Médio: " << round(totalCost / numExecutions) << endl;
+    cout << "Fator de ramificação: " << round(totalFactor / numExecutions) << endl;
     cout << "Tempo médio: " << totalTime/numExecutions << endl;
     cout.rdbuf(original_stdout);
     file.close();
