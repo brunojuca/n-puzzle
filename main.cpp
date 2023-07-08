@@ -209,15 +209,15 @@ int main()
         // else
         //     i--;
 
-        // -------------------------------------------------- Busca em Profundidade limitada e iterativa ---------------------------------------------
+        // -------------------------------------------------- Busca em Profundidade limitada ---------------------------------------------
         // puzzle.shuffle(1000000);
-        // int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
-        // float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
+        // //int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
+        // //float K = 2; // constante qualquer que serve para ajustar um valor mais aproximado do limite de profundidade
         // //float depthLimit = K * distance;
         // //int depth = min((int)depthLimit,30);
         // if(puzzle.checkParity()){
         //     auto start = chrono::steady_clock::now();
-        //     if(!puzzle.iterativeDepthSearch(40)){
+        //     if(!puzzle.depthLimitedSearch(40)){
         //         cout << "solution invalid." << endl;
         //         i--;
         //     }
