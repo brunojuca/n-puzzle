@@ -22,13 +22,7 @@ class Puzzle
 private:
     vector<vector<int>> state;
     vector<vector<int>> goalState;
-    set<string> visitedStates2;
-    // stack<vector<vector<int>>> openList;
-    // set<vector<vector<int>>> visitedStates;
 
-    //stack<string> openList;
-    //set<string> closedList;
-    int moves;
     pair<int, int> zeroPos = make_pair(0, 0);
     int dimension;
     int n;
@@ -66,19 +60,14 @@ public:
 
     // funções principais
     bool backTracking(int dephtLimit);
-    bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>, 
-    vector<vector<int>>> parentMap, int &nodesExpanded, int depth,  set<vector<vector<int>>> &openList,
-     set<vector<vector<int>>> &visitedStates); // backTracking
-    bool breadthFirstSearch(); // busca em largura
-//     bool depthLimitedSearch(int depthLimit, set<vector<vector<int>>> &closedList,stack<vector<vector<int>>> &openList, int &depth,
-//    vector<vector<int>> currentState, map<vector<vector<int>>, vector<vector<int>>> &parentMap ); // busca em profundidade limitada
-//    bool iterativeDepthSearch(int maxDepth); // busca em profundidade iterativa
+    bool auxBackTracking(int dephtLimit,vector<vector<int>> initial, map<vector<vector<int>>,vector<vector<int>>> parentMap, 
+    int &nodesExpanded, int depth,  set<vector<vector<int>>> &openList, set<vector<vector<int>>> &visitedStates); // backTracking
+    bool breadthFirstSearch(); 
     bool depthLimitedSearch(int depthLimit);
-    //bool depthLimitedSearch(int depthLimit);
-    bool orderedSearch(); // busca ordenada
-    bool greedySearch(); // busca gulosa
-    bool AstarSearch(); // Busca A*
-    bool IDAstarSearch(); // Busca IDA*
+    bool orderedSearch(); 
+    bool greedySearch(); 
+    bool AstarSearch(); 
+    bool IDAstarSearch(); 
 };
 
 #endif
