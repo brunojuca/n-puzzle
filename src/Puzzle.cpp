@@ -117,6 +117,7 @@ void Puzzle::shuffle(int moves)
     int madeMoves = 0;
     while (madeMoves < moves)
     {
+        setZeroPosition();
         this->safelyMoveZero(movements[rand() % 4]);
         madeMoves++;
     }
@@ -296,12 +297,12 @@ bool Puzzle::auxBackTracking(int depthLimit, vector<vector<int>> initial,
         path.push_back(initial);
         reverse(path.begin(), path.end()); // Inverte ocaminho para obter a ordem correta
         // Imprime o caminho
-        // cout << "Path: " << endl;
-        // for (const auto &state : path)
-        // {
-        //     printState2(state);
-        //     cout << endl;
-        // }
+        cout << "Path: " << endl;
+        for (const auto &state : path)
+        {
+            printState2(state);
+            cout << endl;
+        }
         return true;
     }
     if (depth == depthLimit)
@@ -383,12 +384,12 @@ bool Puzzle::breadthFirstSearch()
             this->depthMax = depth;
             path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            // cout << "Path: " << endl;
-            // for (const auto &state : path)
-            // {
-            //     printState2(state);
-            //     cout << endl;
-            // }
+            cout << "Path: " << endl;
+            for (const auto &state : path)
+            {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
     }
@@ -446,12 +447,12 @@ bool Puzzle::depthLimitedSearch(int depthLimit)
             this->depthMax = currentState.second;
             path.push_back(initial);
             reverse(path.begin(), path.end()); 
-            // cout << "Path: " << endl;
-            // for (const auto &state : path)
-            // {
-            //     printState2(state);
-            //     cout << endl;
-            // }
+            cout << "Path: " << endl;
+            for (const auto &state : path)
+            {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
     }
@@ -519,12 +520,12 @@ bool Puzzle::orderedSearch()
             }
             path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            // cout << "Path: " << endl;
-            // for (const auto &state : path)
-            // {
-            //     printState2(state);
-            //     cout << endl;
-            // }
+            cout << "Path: " << endl;
+            for (const auto &state : path)
+            {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
 
@@ -537,6 +538,7 @@ bool Puzzle::greedySearch()
     {
         vector<vector<int>> puzzle;
         int heuristic;
+        int accumulateCost;
         int depth; // Profundidade do nó atual
         bool operator<(const PuzzleNode &other) const
         {
@@ -550,11 +552,10 @@ bool Puzzle::greedySearch()
     map<vector<vector<int>>, vector<vector<int>>> parentMap; 
     parentMap[this->state] = {};
     int nodesExpanded = 0;
-    openList.push({this->state, manhattanDistance(), 0});
+    openList.push({this->state, manhattanDistance(), manhattanDistance() ,0});
     while (!openList.empty())
     {
         PuzzleNode currentNode = openList.top(); // seleciona o de menor custo (primeiro da fila)
-        cout << currentNode.heuristic << endl;
         openList.pop();
         this->state = currentNode.puzzle;
         setZeroPosition();
@@ -565,6 +566,7 @@ bool Puzzle::greedySearch()
             this->visited = closedList.size();
             this->depthMax = currentNode.depth;
             this->branchingFactor = calculateBranchingFactor(parentMap);
+            this->accumulatedCost = currentNode.accumulateCost;
             vector<vector<vector<int>>> path;
             while (currentState != initial)
             { 
@@ -590,7 +592,8 @@ bool Puzzle::greedySearch()
                 {
                     nodesExpanded++;
                     int childDepth = currentNode.depth + 1;
-                    openList.push({this->state, this->manhattanDistance(), childDepth});
+                    int childAccumulate = currentNode.accumulateCost + this->manhattanDistance();
+                    openList.push({this->state, this->manhattanDistance(), childAccumulate ,childDepth});
                     parentMap[this->state] = currentState;
                 }
                 safelyMoveZero({-movement.first, -movement.second});
@@ -643,12 +646,12 @@ bool Puzzle::AstarSearch()
             }
             path.push_back(initial);
             reverse(path.begin(), path.end()); // Inverte o vetor de caminho para obter a ordem correta
-            // cout << "Path: " << endl;
-            // for (const auto &state : path)
-            // {
-            //     printState2(state);
-            //     cout << endl;
-            // }
+            cout << "Path: " << endl;
+            for (const auto &state : path)
+            {
+                printState2(state);
+                cout << endl;
+            }
             return true;
         }
         vector<pair<int, int>> movements = {movement::UP, movement::RIGHT, movement::DOWN, movement::LEFT};
