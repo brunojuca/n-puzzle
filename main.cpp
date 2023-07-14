@@ -226,7 +226,7 @@ int main()
         {
         case 1:
         {
-            puzzle.shuffle(1000000);
+            puzzle.shuffle(100);
             puzzle.printState();
             auto start = chrono::steady_clock::now();
             int distance = puzzle.manhattanDistance(); // calcula a distância de manhattan para usar como um valor aproximado do limite de profundidade
@@ -238,7 +238,10 @@ int main()
                 cout << "solution invalid." << endl;
             }
             else
-            {
+            {   
+                auto end = chrono::steady_clock::now();
+                auto diff = end - start;
+                totalTime = chrono::duration<double, milli>(diff).count();
                 totalStatesExpanded += puzzle.getStateExpanded();
                 totalStatesVisited += puzzle.getVisited();
                 totalDepth += puzzle.getDepth();
@@ -247,11 +250,9 @@ int main()
                 cout << "Expandidos: " << puzzle.getStateExpanded() << endl;
                 cout << "Visitados: " << puzzle.getVisited() << endl;
                 cout << "Profundidade: " << puzzle.getDepth() << endl;
-                cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
+                cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;          
+                cout << "Tempo: " << totalTime << endl;
                 cout << endl;
-                auto end = chrono::steady_clock::now();
-                auto diff = end - start;
-                totalTime += chrono::duration<double, milli>(diff).count();
             }
         }
         break;
@@ -268,6 +269,9 @@ int main()
                 }
                 else
                 {
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
                     totalStatesExpanded += puzzle.getStateExpanded();
                     totalStatesVisited += puzzle.getVisited();
                     totalDepth += puzzle.getDepth();
@@ -278,11 +282,10 @@ int main()
                     cout << "Visitados: " << puzzle.getVisited() << endl;
                     cout << "Profundidade: " << puzzle.getDepth() << endl;
                     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
+                    cout << "Tempo: " << totalTime << endl;
                     cout << endl;
 
-                    auto end = chrono::steady_clock::now();
-                    auto diff = end - start;
-                    totalTime += chrono::duration<double, milli>(diff).count();
+                   
                 }
             }
         }
@@ -302,6 +305,10 @@ int main()
                 }
                 else
                 {
+
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
                     totalStatesExpanded += puzzle.getStateExpanded();
                     totalStatesVisited += puzzle.getVisited();
                     totalDepth += puzzle.getDepth();
@@ -312,11 +319,9 @@ int main()
                     cout << "Visitados: " << puzzle.getVisited() << endl;
                     cout << "Profundidade: " << puzzle.getDepth() << endl;
                     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
+                    cout << "Tempo: " << totalTime << endl;
                     cout << endl;
 
-                    auto end = chrono::steady_clock::now();
-                    auto diff = end - start;
-                    totalTime += chrono::duration<double, milli>(diff).count();
                 }
             }
         }
@@ -335,6 +340,9 @@ int main()
                 }
                 else
                 {
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
                     totalStatesExpanded += puzzle.getStateExpanded();
                     totalStatesVisited += puzzle.getVisited();
                     totalDepth += puzzle.getDepth();
@@ -347,10 +355,9 @@ int main()
                     cout << "Profundidade: " << puzzle.getDepth() << endl;
                     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
                     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+                    cout << "Tempo: " << totalTime << endl;
                     cout << endl;
-                    auto end = chrono::steady_clock::now();
-                    auto diff = end - start;
-                    totalTime += chrono::duration<double, milli>(diff).count();
+
                 }
             }
         }
@@ -369,6 +376,9 @@ int main()
                 }
                 else
                 {
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
                     totalStatesExpanded += puzzle.getStateExpanded();
                     totalStatesVisited += puzzle.getVisited();
                     totalDepth += puzzle.getDepth();
@@ -381,11 +391,8 @@ int main()
                     cout << "Profundidade: " << puzzle.getDepth() << endl;
                     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
                     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+                    cout << "Tempo: " << totalTime << endl;
                     cout << endl;
-
-                    auto end = chrono::steady_clock::now();
-                    auto diff = end - start;
-                    totalTime += chrono::duration<double, milli>(diff).count();
                 }
             }
         }
@@ -402,23 +409,25 @@ int main()
                 {
                     cout << "solution invalid." << endl;
                 }
-                totalStatesExpanded += puzzle.getStateExpanded();
-                totalStatesVisited += puzzle.getVisited();
-                totalDepth += puzzle.getDepth();
-                totalCost += puzzle.getAccumulatedCost();
-                totalFactor += puzzle.getBranchingFactor();
+                else{
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
+                    totalStatesExpanded += puzzle.getStateExpanded();
+                    totalStatesVisited += puzzle.getVisited();
+                    totalDepth += puzzle.getDepth();
+                    totalCost += puzzle.getAccumulatedCost();
+                    totalFactor += puzzle.getBranchingFactor();
 
-                cout << "---------- RESULTADO -----------" << endl;
-                cout << "Expandidos: " << puzzle.getStateExpanded() << endl;
-                cout << "Visitados: " << puzzle.getVisited() << endl;
-                cout << "Profundidade: " << puzzle.getDepth() << endl;
-                cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
-                cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
-                cout << endl;
-
-                auto end = chrono::steady_clock::now();
-                auto diff = end - start;
-                totalTime += chrono::duration<double, milli>(diff).count();
+                    cout << "---------- RESULTADO -----------" << endl;
+                    cout << "Expandidos: " << puzzle.getStateExpanded() << endl;
+                    cout << "Visitados: " << puzzle.getVisited() << endl;
+                    cout << "Profundidade: " << puzzle.getDepth() << endl;
+                    cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
+                    cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+                    cout << "Tempo: " << totalTime << endl;
+                    cout << endl;
+                }
             }
         }
 
@@ -436,23 +445,23 @@ int main()
                 }
                 else
                 {
+                    auto end = chrono::steady_clock::now();
+                    auto diff = end - start;
+                    totalTime = chrono::duration<double, milli>(diff).count();
                     totalStatesExpanded += puzzle.getStateExpanded();
                     totalStatesVisited += puzzle.getVisited();
                     totalDepth += puzzle.getDepth();
                     totalCost += puzzle.getAccumulatedCost();
                     totalFactor += puzzle.getBranchingFactor();
 
-                    cout << "---------- RESULTADO do ultimo patamar-----------" << endl;
-                    cout << "Expandidos : " << puzzle.getStateExpanded() << endl;
-                    cout << "Visitados : " << puzzle.getVisited() << endl;
+                    cout << "---------- RESULTADO -----------" << endl;
+                    cout << "Expandidos: " << puzzle.getStateExpanded() << endl;
+                    cout << "Visitados: " << puzzle.getVisited() << endl;
                     cout << "Profundidade: " << puzzle.getDepth() << endl;
                     cout << "Fator de ramificacao: " << puzzle.getBranchingFactor() << endl;
                     cout << "Custo: " << puzzle.getAccumulatedCost() << endl;
+                    cout << "Tempo: " << totalTime << endl;
                     cout << endl;
-
-                    auto end = chrono::steady_clock::now();
-                    auto diff = end - start;
-                    totalTime += chrono::duration<double, milli>(diff).count();
                 }
             }
         }
